@@ -4,6 +4,7 @@
 %}
 
 %option noyywrap
+%option yylineno
 
 %%
 "("     {return LEFT_PAREN;}
@@ -44,12 +45,12 @@
 "var"    {return VAR;}
 "while"  {return WHILE;}
 
-\".*\"         {return STRING;}
-\/\/.*                {/*ignore comments*/}
-<<EOF>>             {return EOF_;}
-[0-9]+(\.[0-9]+)*   {return NUMBER;}
-[0-9a-zA-Z_]+       {return IDENTIFIER;}
+\".*\"                   {return STRING;}
+\/\/.*                   {/*ignore comments*/}
+<<EOF>>                  {return EOF_;}
+[+-]?[0-9]+(\.[0-9]+)*   {return NUMBER;}
+[0-9a-zA-Z_]+            {return IDENTIFIER;}
 
-[ \n\t]+            {/*Ignore*/}
+[ \n\t]+                 {/*Ignore*/}
 
 %%

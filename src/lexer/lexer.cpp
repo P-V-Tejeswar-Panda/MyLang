@@ -3,20 +3,21 @@
 
 extern int yylex();
 extern char* yytext;
+extern int yylineno;
+
+Token nextToken(){
+    int token;
+    token = yylex();
+    Token tk((enum TokenType)token, std::string(yytext), yylineno);
+    return tk;
+}
 
 int main(int argc, char** argv){
-    int token;
-    while(token = yylex()){
-        std::cout << token;
-        if(token == NUMBER)
-            std::cout << ": " << yytext << std::endl;
-        else if(token == STRING)
-            std::cout << ": " << yytext << std::endl;
-        else if(token == EOF_){
-            std::cout << ": " << yytext << std::endl;
-            break;
-        }
-        else
-            std::cout << ": " << yytext << std::endl;
+    Token tk = nextToken();
+    while(tk.ttype != EOF_){
+        std::cout << tk.ttype;
+        std::cout << ": " << tk.lexeme << "\tLn: " 
+                    << tk.lineno << std::endl;
+        tk = nextToken();
     }
 }
