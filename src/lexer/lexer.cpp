@@ -1,5 +1,5 @@
 #include <iostream>
-#include "lexer.h"
+#include <lexer/token.h>
 
 extern int yylex();
 extern char* yytext;

@@ -1,5 +1,5 @@
 %{
-    #include "lexer.h"
+    #include <lexer/token.h>
     #include <string.h>
 %}
 
