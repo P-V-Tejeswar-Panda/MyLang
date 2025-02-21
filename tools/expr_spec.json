@@ -1,0 +1,55 @@
+{
+    "filename": "expr",
+    "headers": [
+        "lexer/token.h", "string"
+    ],
+    "classes": [
+        {
+            "name": "ExprVisitor",
+            "functions": [
+                {
+                    "name": "visit",
+                    "args": [["Expr*", "expr"]],
+                    "returntype": "void"
+                }
+            ]
+        },
+        {
+            "name": "Expr",
+            "functions": [
+                {
+                    "name": "accept",
+                    "args": [["ExprVisitor*", "visitor"]],
+                    "body": "visitor->visit(this);",
+                    "returntype": "void"
+                }
+            ]
+        },
+        {
+            "name": "Literal",
+            "base": "Expr",
+            "init_args": [["enum TokenType", "ttype"], ["std::string", "lexeme"]]
+        },
+        {
+            "name": "Grouping",
+            "base": "Expr",
+            "init_args": [["Expr*", "expr"]]
+        },
+        {
+            "name": "Unary",
+            "base": "Expr",
+            "init_args": [["enum TokenType","ttype"],["Expr*", "expr"]]
+        },
+        {
+            "name": "Binary",
+            "base": "Expr",
+            "init_args": [["Expr*", "left"], ["Operator*", "op"], ["Expr*", "right"]]
+        },
+        {
+            "name": "Operator",
+            "base": "Expr",
+            "init_args": [["enum TokenType", "ttype"]]
+        }
+    ]
+
+}
