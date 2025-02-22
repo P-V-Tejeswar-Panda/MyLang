@@ -23,6 +23,11 @@ Token *Parser::getTokenAt(int pos)
     return this->tokens->at(pos);
 }
 
+ParseError *Parser::error(Token *tk, std::string msg)
+{
+    myLang::communicateError(tk, msg);
+    return new ParseError(tk);
+}
 void Parser::advance()
 {
     this->currentPos++;
@@ -148,7 +153,7 @@ Expr *Parser::getPrimary()
             advance();
         }
         else
-            exp = NULL;
+            throw error(t, "Expect ')' after expression.");
     }
     else if (t && (t->ttype == TokenType::NUMBER ||
                    t->ttype == TokenType::STRING ||
@@ -158,10 +163,24 @@ Expr *Parser::getPrimary()
     {
         exp = new Literal(t);
     }
+    else
+        throw error(t, "Expect expression.");
     return exp;
 }
 
 Expr *Parser::getAST()
 {
-    return getExpr();
+    try
+    {
+        return getExpr();
+    }
+    catch(const ParseError* e)
+    {
+        return NULL;
+    }
+}
+
+ParseError::ParseError(Token *tk)
+{
+    this->tk = tk;
 }
