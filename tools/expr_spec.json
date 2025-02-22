@@ -1,5 +1,7 @@
 {
     "filename": "expr",
+    "headerlocation": "/src/include/parser",
+    "bodylocation": "/src/parser", 
     "headers": [
         "lexer/token.h", "string"
     ],
@@ -10,7 +12,8 @@
                 {
                     "name": "visit",
                     "args": [["Expr*", "expr"]],
-                    "returntype": "void"
+                    "returntype": "void",
+                    "virtual": "pure"
                 }
             ]
         },
