@@ -6,6 +6,7 @@
 #define __EXPR_H__
 #include <lexer/token.h>
 #include <string>
+#include <parser/ast_node_types.h>
 
 
 class ExprVisitor{
@@ -18,40 +19,40 @@ class Expr{
 public:
     Expr();
     void accept(ExprVisitor* visitor);
+    virtual enum AST_NODE_TYPES nodeType() = 0;
 };
 
 class Literal: public Expr{
 public:
-    enum TokenType ttype;
-    std::string lexeme;
-    Literal(enum TokenType ttype,std::string lexeme);
+    Token* op;
+    Literal(Token* op);
+    enum AST_NODE_TYPES nodeType();
 };
 
 class Grouping: public Expr{
 public:
+    Token* op;
     Expr* expr;
-    Grouping(Expr* expr);
+    Token* cp;
+    Grouping(Token* op,Expr* expr,Token* cp);
+    enum AST_NODE_TYPES nodeType();
 };
 
 class Unary: public Expr{
 public:
-    enum TokenType ttype;
+    Token* token;
     Expr* expr;
-    Unary(enum TokenType ttype,Expr* expr);
+    Unary(Token* token,Expr* expr);
+    enum AST_NODE_TYPES nodeType();
 };
 
 class Binary: public Expr{
 public:
     Expr* left;
-    Operator* op;
+    Token* op;
     Expr* right;
-    Binary(Expr* left,Operator* op,Expr* right);
-};
-
-class Operator: public Expr{
-public:
-    enum TokenType ttype;
-    Operator(enum TokenType ttype);
+    Binary(Expr* left,Token* op,Expr* right);
+    enum AST_NODE_TYPES nodeType();
 };
 
 #endif

@@ -234,4 +234,4 @@ if __name__ == "__main__":
         spec = json.load(spec_file)
         #pprint(spec)
         fileGen = FileContentsGenerator(spec)
-        print(fileGen.generate())
+        print(fileGen.generateHeader())

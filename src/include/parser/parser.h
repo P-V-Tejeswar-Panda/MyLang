@@ -9,9 +9,9 @@ class Parser{
     int currentPos;
     Parser(std::vector<Token*>* tokens);
     Token* getTokenAt(int pos);
-    Token* next();
+    void advance();
     Token* previous();
-
+    Token* peek();
     Expr* getExpr();
     Expr* getEquality();
     Expr* getComparison();

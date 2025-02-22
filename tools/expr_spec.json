@@ -3,7 +3,7 @@
     "headerlocation": "/src/include/parser",
     "bodylocation": "/src/parser", 
     "headers": [
-        "lexer/token.h", "string"
+        "lexer/token.h", "string", "parser/ast_node_types.h"
     ],
     "classes": [
         {
@@ -25,33 +25,61 @@
                     "args": [["ExprVisitor*", "visitor"]],
                     "body": "visitor->visit(this);",
                     "returntype": "void"
+                },
+                {
+                    "name": "nodeType",
+                    "returntype": "enum AST_NODE_TYPES",
+                    "virtual": "pure"
                 }
             ]
         },
         {
             "name": "Literal",
             "base": "Expr",
-            "init_args": [["enum TokenType", "ttype"], ["std::string", "lexeme"]]
+            "init_args": [["Token*", "op"]],
+            "functions": [
+                {
+                    "name": "nodeType",
+                    "returntype": "enum AST_NODE_TYPES",
+                    "body": "return AST_NODE_TYPES::LITERAL;"
+                }
+            ]
         },
         {
             "name": "Grouping",
             "base": "Expr",
-            "init_args": [["Expr*", "expr"]]
+            "init_args": [["Token*", "op"],["Expr*", "expr"],["Token*", "cp"]],
+            "functions": [
+                {
+                    "name": "nodeType",
+                    "returntype": "enum AST_NODE_TYPES",
+                    "body": "return AST_NODE_TYPES::GROUPING;"
+                }
+            ]
         },
         {
             "name": "Unary",
             "base": "Expr",
-            "init_args": [["enum TokenType","ttype"],["Expr*", "expr"]]
+            "init_args": [["Token*","token"],["Expr*", "expr"]],
+            "functions": [
+                {
+                    "name": "nodeType",
+                    "returntype": "enum AST_NODE_TYPES",
+                    "body": "return AST_NODE_TYPES::UNARY;"
+                }
+            ]
         },
         {
             "name": "Binary",
             "base": "Expr",
-            "init_args": [["Expr*", "left"], ["Operator*", "op"], ["Expr*", "right"]]
-        },
-        {
-            "name": "Operator",
-            "base": "Expr",
-            "init_args": [["enum TokenType", "ttype"]]
+            "init_args": [["Expr*", "left"], ["Token*", "op"], ["Expr*", "right"]],
+            "functions": [
+                {
+                    "name": "nodeType",
+                    "returntype": "enum AST_NODE_TYPES",
+                    "body": "return AST_NODE_TYPES::BINARY;"
+                }
+            ]
         }
     ]
 

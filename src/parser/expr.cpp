@@ -14,32 +14,40 @@ void Expr::accept(ExprVisitor* visitor){
 }
 
 
-Literal::Literal(enum TokenType ttype,std::string lexeme){
-    this->ttype = ttype;
-    this->lexeme = lexeme;
+Literal::Literal(Token* op){
+    this->op = op;
+}
+enum AST_NODE_TYPES Literal::nodeType(){
+    return AST_NODE_TYPES::LITERAL;
 }
 
 
-Grouping::Grouping(Expr* expr){
+Grouping::Grouping(Token* op,Expr* expr,Token* cp){
+    this->op = op;
+    this->expr = expr;
+    this->cp = cp;
+}
+enum AST_NODE_TYPES Grouping::nodeType(){
+    return AST_NODE_TYPES::GROUPING;
+}
+
+
+Unary::Unary(Token* token,Expr* expr){
+    this->token = token;
     this->expr = expr;
 }
-
-
-Unary::Unary(enum TokenType ttype,Expr* expr){
-    this->ttype = ttype;
-    this->expr = expr;
+enum AST_NODE_TYPES Unary::nodeType(){
+    return AST_NODE_TYPES::UNARY;
 }
 
 
-Binary::Binary(Expr* left,Operator* op,Expr* right){
+Binary::Binary(Expr* left,Token* op,Expr* right){
     this->left = left;
     this->op = op;
     this->right = right;
 }
-
-
-Operator::Operator(enum TokenType ttype){
-    this->ttype = ttype;
+enum AST_NODE_TYPES Binary::nodeType(){
+    return AST_NODE_TYPES::BINARY;
 }
 
 
