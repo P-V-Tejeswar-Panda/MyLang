@@ -15,7 +15,6 @@ primary        → NUMBER | STRING | "true" | "false" | "nil"
 */
 #include <parser/parser.h>
 #include <lexer/token.h>
-#include "parser.h"
 
 
 Token *Parser::getTokenAt(int pos)
@@ -23,10 +22,35 @@ Token *Parser::getTokenAt(int pos)
     return this->tokens->at(pos);
 }
 
-ParseError *Parser::error(Token *tk, std::string msg)
+myLang::ParseError *Parser::error(Token *tk, std::string msg)
 {
     myLang::communicateError(tk, msg);
-    return new ParseError(tk);
+    return new myLang::ParseError(tk);
+}
+void Parser::synchronize()
+{
+    // We will have the offending / unexpected token in the queue.
+    advance();
+    while(peek()){
+        if(peek()->ttype == SEMICOLON){
+            advance();
+            return;
+        }
+
+        switch(peek()->ttype){
+            case TokenType::CLASS:
+            case TokenType::FUN:
+            case TokenType::VAR:
+            case TokenType::FOR:
+            case TokenType::IF:
+            case TokenType::WHILE:
+            case TokenType::PRINT:
+            case TokenType::RETURN:
+                return;
+        }
+
+        advance();
+    }
 }
 void Parser::advance()
 {
@@ -174,13 +198,9 @@ Expr *Parser::getAST()
     {
         return getExpr();
     }
-    catch(const ParseError* e)
+    catch(const myLang::ParseError* e)
     {
         return NULL;
     }
 }
 
-ParseError::ParseError(Token *tk)
-{
-    this->tk = tk;
-}

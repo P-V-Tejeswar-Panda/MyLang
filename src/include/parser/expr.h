@@ -7,18 +7,19 @@
 #include <lexer/token.h>
 #include <string>
 #include <parser/ast_node_types.h>
+#include <interpreter/myLang_types.h>
 
 
 class ExprVisitor{
 public:
     ExprVisitor();
-    virtual void visit(Expr* expr) = 0;
+    virtual MyLang_Object* visit(Expr* expr) = 0;
 };
 
 class Expr{
 public:
     Expr();
-    void accept(ExprVisitor* visitor);
+    MyLang_Object* accept(ExprVisitor* visitor);
     virtual enum AST_NODE_TYPES nodeType() = 0;
 };
 
