@@ -190,5 +190,12 @@ std::string Interpreter::stringify(MyLang_Object *obj)
     if(obj->getType() == MyLang_object_type::MYLANG_STRING){
         return ((MyLang_String*)obj)->value;
     }
+    if(obj->getType() == MyLang_object_type::MYLANG_BOOLEAN){
+        bool v = ((MyLang_Boolean*)obj)->value;
+        if(v){
+            return "true";
+        }
+        return "false";
+    }
     return "Error";
 }

@@ -202,7 +202,12 @@ Expr *Parser::getAST()
 {
     try
     {
-        return getExpr();
+        Expr* exp = getExpr();
+        if(peek()->ttype != TokenType::EOF_){
+            this->error(peek(), "Unexpected token.");
+            return NULL;
+        }
+        return exp;
     }
     catch(const myLang::ParseError* e)
     {

@@ -15,7 +15,7 @@ class ExprVisitor;
 class Expr{
 public:
     Expr();
-    //virtual MyLang_Object* accept(ExprVisitor* visitor);
+    virtual MyLang_Object* accept(ExprVisitor* visitor) = 0;
     virtual enum AST_NODE_TYPES nodeType() = 0;
 };
 
@@ -59,7 +59,6 @@ public:
 class ExprVisitor{
     public:
         ExprVisitor();
-        //virtual MyLang_Object* visit(Expr* expr) = 0;
         virtual MyLang_Object* visit(Literal* literal) = 0;
         virtual MyLang_Object* visit(Grouping* grouping) = 0;
         virtual MyLang_Object* visit(Unary* unary) = 0;
