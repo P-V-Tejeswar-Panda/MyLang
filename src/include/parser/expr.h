@@ -9,18 +9,13 @@
 #include <parser/ast_node_types.h>
 #include <interpreter/myLang_types.h>
 
-class Expr;
+class ExprVisitor;
 
-class ExprVisitor{
-public:
-    ExprVisitor();
-    virtual MyLang_Object* visit(Expr* expr) = 0;
-};
 
 class Expr{
 public:
     Expr();
-    MyLang_Object* accept(ExprVisitor* visitor);
+    //virtual MyLang_Object* accept(ExprVisitor* visitor);
     virtual enum AST_NODE_TYPES nodeType() = 0;
 };
 
@@ -29,6 +24,7 @@ public:
     Token* op;
     Literal(Token* op);
     enum AST_NODE_TYPES nodeType();
+    virtual MyLang_Object* accept(ExprVisitor* visitor);
 };
 
 class Grouping: public Expr{
@@ -38,6 +34,7 @@ public:
     Token* cp;
     Grouping(Token* op,Expr* expr,Token* cp);
     enum AST_NODE_TYPES nodeType();
+    virtual MyLang_Object* accept(ExprVisitor* visitor);
 };
 
 class Unary: public Expr{
@@ -46,6 +43,7 @@ public:
     Expr* expr;
     Unary(Token* token,Expr* expr);
     enum AST_NODE_TYPES nodeType();
+    virtual MyLang_Object* accept(ExprVisitor* visitor);
 };
 
 class Binary: public Expr{
@@ -55,6 +53,17 @@ public:
     Expr* right;
     Binary(Expr* left,Token* op,Expr* right);
     enum AST_NODE_TYPES nodeType();
+    virtual MyLang_Object* accept(ExprVisitor* visitor);
+};
+
+class ExprVisitor{
+    public:
+        ExprVisitor();
+        //virtual MyLang_Object* visit(Expr* expr) = 0;
+        virtual MyLang_Object* visit(Literal* literal) = 0;
+        virtual MyLang_Object* visit(Grouping* grouping) = 0;
+        virtual MyLang_Object* visit(Unary* unary) = 0;
+        virtual MyLang_Object* visit(Binary* binary) = 0;
 };
 
 #endif

@@ -4,7 +4,6 @@
 #include <lexer/token.h>
 #include <parser/expr.h>
 #include <errors/errors.h>
-#include <errors/errors.h>
 
 class Parser{
     std::vector<Token*>* tokens;

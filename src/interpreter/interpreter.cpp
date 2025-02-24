@@ -2,10 +2,10 @@
 
 
 
-MyLang_Object *Interpreter::visit(Expr *expr)
-{
-    return nullptr;
-}
+// MyLang_Object *Interpreter::visit(Expr *expr)
+// {
+//     return nullptr;
+// }
 
 MyLang_Object *Interpreter::visit(Literal *literal)
 {
@@ -36,9 +36,11 @@ MyLang_Object *Interpreter::visit(Unary *unary)
     MyLang_Object* obj = evaluate(unary->expr);
     switch(unary->token->ttype){
         case TokenType::MINUS:
-            checkNumberOperand(unary->token, obj);
-            MyLang_Double* d = (MyLang_Double*)obj;
-            return new MyLang_Double(-1*d->value);
+            {
+                checkNumberOperand(unary->token, obj);
+                MyLang_Double* d = (MyLang_Double*)obj;
+                return new MyLang_Double(-1*d->value);
+            }
         case TokenType::BANG:
             return new MyLang_Boolean(!isTruthy(obj));
     }
@@ -108,7 +110,17 @@ void Interpreter::interpret(Expr *expression)
 
 MyLang_Object *Interpreter::evaluate(Expr* expr)
 {
-    return expr->accept(this);
+    switch (expr->nodeType()){
+        case AST_NODE_TYPES::BINARY:
+            return ((Binary*)expr)->accept(this);
+        case AST_NODE_TYPES::GROUPING:
+            return ((Grouping*)expr)->accept(this);
+        case AST_NODE_TYPES::LITERAL:
+            return ((Literal*)expr)->accept(this);
+        case AST_NODE_TYPES::UNARY:
+            return ((Unary*)expr)->accept(this);
+    }
+    return NULL;
 }
 
 bool Interpreter::isTruthy(MyLang_Object *obj)
@@ -152,6 +164,7 @@ bool Interpreter::isEqual(MyLang_Object *l, MyLang_Object *r)
             return l_val == ((MyLang_String*)r)->value;
         else return false;
     }
+    return false;
 }
 
 void Interpreter::checkNumberOperand(Token *op, MyLang_Object *operand)

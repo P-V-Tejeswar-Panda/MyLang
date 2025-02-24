@@ -8,7 +8,7 @@
 
 class Interpreter: public ExprVisitor{
 public:
-    virtual MyLang_Object* visit(Expr* expr);
+    //virtual MyLang_Object* visit(Expr* expr);
     virtual MyLang_Object* visit(Literal* literal);
     virtual MyLang_Object* visit(Grouping* grouping);
     virtual MyLang_Object* visit(Unary* unary);

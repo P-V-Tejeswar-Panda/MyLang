@@ -74,8 +74,6 @@ Token *Parser::peek()
 {
     if(this->currentPos >= this->tokens->size())
         return NULL;
-    if(peek()->ttype == TokenType::EOF_)
-        return NULL;
     return this->getTokenAt(this->currentPos);
 }
 
@@ -160,6 +158,7 @@ Expr *Parser::getUnary()
     if(t && (t->ttype == TokenType::BANG ||
              t->ttype == TokenType::MINUS))
     {
+        advance();
         exp = getUnary();
         exp = new Unary(t, exp);
     }
@@ -173,12 +172,12 @@ Expr *Parser::getPrimary()
 {
     Expr* exp = NULL;
     Token* t = peek();
-    if(t && t->ttype == TokenType::LEFT_BRACE){
+    if(t && t->ttype == TokenType::LEFT_PAREN){
         advance();
         exp = getExpr();
         Token* op = t;
         t = peek();
-        if(t->ttype == TokenType::RIGHT_BRACE){
+        if(t->ttype == TokenType::RIGHT_PAREN){
             exp = new Grouping(op, exp, t);
             advance();
         }
@@ -192,6 +191,7 @@ Expr *Parser::getPrimary()
                    t->ttype == TokenType::NIL))
     {
         exp = new Literal(t);
+        advance();
     }
     else
         throw error(t, "Expect expression.");

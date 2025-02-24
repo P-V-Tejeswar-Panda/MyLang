@@ -21,14 +21,14 @@ void communicateError(Token *tk, std::string msg){
         err_msg << tk->lineno << ": at '" << tk->lexeme << "' : " << msg;
         report(err_msg.str());
     }
-    hadError = true;
+    MyLangGlobals::getInstance().hadError = true;
 }
 void communicateRuntimeError(RuntimeError *err)
 {
     std::ostringstream err_msg;
     err_msg << err->msg << "\n[line " << err->tk->lineno << "]";
     report(err_msg.str());
-    hadRuntimeError = true;
+    MyLangGlobals::getInstance().hadRuntimeError = true;
 }
 void report(std::string msg){
     std::cout << msg << std::endl;
