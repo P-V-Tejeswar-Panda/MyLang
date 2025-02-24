@@ -9,6 +9,7 @@
 #include <parser/ast_node_types.h>
 #include <interpreter/myLang_types.h>
 
+class Expr;
 
 class ExprVisitor{
 public:

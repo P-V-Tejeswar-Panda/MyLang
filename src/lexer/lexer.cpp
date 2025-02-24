@@ -1,23 +1,24 @@
-#include <iostream>
 #include <lexer/token.h>
+#include <vector>
+
 
 extern int yylex();
 extern char* yytext;
 extern int yylineno;
 
-Token nextToken(){
+Token* nextToken(){
     int token;
     token = yylex();
-    Token tk((enum TokenType)token, std::string(yytext), yylineno);
-    return tk;
+    return new Token((enum TokenType)token, std::string(yytext), yylineno);
 }
 
-int main(int argc, char** argv){
-    Token tk = nextToken();
-    while(tk.ttype != EOF_){
-        std::cout << tk.ttype;
-        std::cout << ": " << tk.lexeme << "\tLn: " 
-                    << tk.lineno << std::endl;
-        tk = nextToken();
+std::vector<Token*>* scanAllTokens(){
+    std::vector<Token*>* vec = new std::vector<Token*>();
+    while(true){
+        Token* tk = nextToken();
+        vec->push_back(tk);
+        if(tk->ttype == TokenType::EOF_)
+            break;
     }
+    return vec;
 }

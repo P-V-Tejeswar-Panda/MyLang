@@ -3,12 +3,13 @@
 #include <vector>
 #include <lexer/token.h>
 #include <parser/expr.h>
-#include <myLang/error.h>
+#include <errors/errors.h>
 #include <errors/errors.h>
 
 class Parser{
     std::vector<Token*>* tokens;
     int currentPos;
+public:
     Parser(std::vector<Token*>* tokens);
     Token* getTokenAt(int pos);
     myLang::ParseError* error(Token* tk, std::string msg);

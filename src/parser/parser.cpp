@@ -17,6 +17,12 @@ primary        → NUMBER | STRING | "true" | "false" | "nil"
 #include <lexer/token.h>
 
 
+Parser::Parser(std::vector<Token *> *tokens)
+{
+    this->tokens = tokens;
+    this->currentPos = 0;
+}
+
 Token *Parser::getTokenAt(int pos)
 {
     return this->tokens->at(pos);
