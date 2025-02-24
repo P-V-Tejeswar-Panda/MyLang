@@ -48,7 +48,7 @@
 \".*\"                   {return STRING;}
 \/\/.*                   {/*ignore comments*/}
 <<EOF>>                  {return EOF_;}
-[+-]?[0-9]+(\.[0-9]+)*   {return NUMBER;}
+[0-9]+(\.[0-9]+)*        {return NUMBER;}
 [0-9a-zA-Z_]+            {return IDENTIFIER;}
 
 [ \n\t]+                 {/*Ignore*/}
