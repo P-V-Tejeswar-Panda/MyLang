@@ -3,6 +3,7 @@
 #include <vector>
 #include <lexer/token.h>
 #include <parser/expr.h>
+#include <parser/stmt.h>
 #include <errors/errors.h>
 
 class Parser{
@@ -24,6 +25,10 @@ public:
     Expr* getUnary();
     Expr* getPrimary();
 
-    Expr* getAST();
+    Stmt* parseStatement();
+    Stmt* parsePrintStatement();
+    Stmt* parseExpressionStatement();
+
+    std::vector<Stmt*>* getAST();
 };
 #endif

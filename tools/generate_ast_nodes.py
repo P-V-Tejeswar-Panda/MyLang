@@ -229,9 +229,9 @@ if __name__ == "__main__":
     # print(generateSubClass("Expr;Grouping;group:Expr*"))
     # print(generateSubClass("Expr;Unary;ttype:enum TokenType;expr:Expr*"))
     # print(generateSubClass("Expr;Operator;ttype:enum TokenType"))
-    spec_file_path = os.path.dirname(__file__)+"/expr_spec.json"
+    spec_file_path = os.path.dirname(__file__)+"/stmt_spec.json"
     with open(spec_file_path, "r") as spec_file:
         spec = json.load(spec_file)
         #pprint(spec)
         fileGen = FileContentsGenerator(spec)
-        print(fileGen.generateHeader())
+        print(fileGen.generate())

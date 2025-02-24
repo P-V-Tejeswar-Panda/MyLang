@@ -98,17 +98,33 @@ MyLang_Object *Interpreter::visit(Binary *binary)
     return NULL;
 }
 
-void Interpreter::interpret(Expr *expression)
+void Interpreter::visit(Print *printStmt)
+{
+    MyLang_Object* val = evaluate(printStmt->expression);
+    std::cout << stringify(val) << std::endl;
+}
+void Interpreter::visit(Expression *exprStmt)
+{
+    evaluate(exprStmt->expression);
+}
+void Interpreter::interpret(std::vector<Stmt*>* stmts)
 {
     try{
-        MyLang_Object* val = evaluate(expression);
-        std::cout << stringify(val) << std::endl;
+        for(Stmt* stmt: (*stmts))
+            execute(stmt);
     } catch (myLang::RuntimeError* err){
         myLang::communicateRuntimeError(err);
     }
 }
 
-MyLang_Object *Interpreter::evaluate(Expr* expr)
+void Interpreter::execute(Stmt *stmt)
+{
+    if(stmt->nodeType() == AST_NODE_TYPES::STMT_PRINT)
+        ((Print*)stmt)->accept(this);
+    if(stmt->nodeType() == AST_NODE_TYPES::STMT_EXPRESSION)
+        ((Expression*)stmt)->accept(this);
+}
+MyLang_Object *Interpreter::evaluate(Expr *expr)
 {
     switch (expr->nodeType()){
         case AST_NODE_TYPES::BINARY:
@@ -199,3 +215,4 @@ std::string Interpreter::stringify(MyLang_Object *obj)
     }
     return "Error";
 }
+

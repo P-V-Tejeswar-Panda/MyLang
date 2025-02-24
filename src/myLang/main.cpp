@@ -12,9 +12,9 @@ int main(void){
     if(MyLangGlobals::getInstance().hadError == true)
         exit(1);
     Parser* parser = new Parser(tokens);
-    Expr* expr = parser->getAST();
+    std::vector<Stmt*>* stmts = parser->getAST();
     if(MyLangGlobals::getInstance().hadError == true)
         exit(2);
     Interpreter* ipreter = new Interpreter();
-    ipreter->interpret(expr);
+    ipreter->interpret(stmts);
 }

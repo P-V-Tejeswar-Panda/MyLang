@@ -198,20 +198,44 @@ Expr *Parser::getPrimary()
     return exp;
 }
 
-Expr *Parser::getAST()
+Stmt *Parser::parseStatement()
+{
+    if(peek()->ttype == TokenType::PRINT)
+        return parsePrintStatement();
+    return parseExpressionStatement();
+}
+Stmt *Parser::parsePrintStatement()
+{
+    advance(); // consume the innital 'print' token.
+    Expr* val = getExpr();
+    if(peek()->ttype != TokenType::SEMICOLON)
+        throw error(peek(), "Expected ';' after value.");
+    advance();
+    return new Print(val);
+}
+Stmt *Parser::parseExpressionStatement()
+{
+    Expr* val = getExpr();
+    if(peek()->ttype != TokenType::SEMICOLON)
+        throw error(peek(), "Expected ';' after expression.");
+    advance();
+    return new Expression(val);
+}
+std::vector<Stmt *> *Parser::getAST()
 {
     try
     {
-        Expr* exp = getExpr();
-        if(peek()->ttype != TokenType::EOF_){
-            this->error(peek(), "Unexpected token.");
-            return NULL;
+        std::vector<Stmt*>* stmts = new std::vector<Stmt*>();
+        while(peek()->ttype != TokenType::EOF_){
+            stmts->push_back(parseStatement());
         }
-        return exp;
+        return stmts;
     }
     catch(const myLang::ParseError* e)
     {
         return NULL;
     }
 }
+
+
 

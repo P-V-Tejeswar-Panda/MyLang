@@ -1,0 +1,74 @@
+{
+    "filename": "stmt",
+    "headerlocation": "/src/include/parser",
+    "bodylocation": "/src/parser", 
+    "headers": [
+        "lexer/token.h", "string", "parser/ast_node_types.h", "parser/expr.h"
+    ],
+    "classes": [
+        {
+            "name": "Stmt",
+            "functions": [
+                {
+                    "name": "nodeType",
+                    "returntype": "enum AST_NODE_TYPES",
+                    "virtual": "pure"
+                }
+            ]
+        },
+        {
+            "name": "Expression",
+            "base": "Stmt",
+            "init_args": [["Expr*", "expression"]],
+            "functions": [
+                {
+                    "name": "nodeType",
+                    "returntype": "enum AST_NODE_TYPES",
+                    "body": "return AST_NODE_TYPES::STMT_EXPRESSION;"
+                },
+                {
+                    "name": "accept",
+                    "returntype": "void",
+                    "args": [["StmtVisitor*", "visitor"]],
+                    "body": "return visitor->visit(this);"
+                }
+            ]
+        },
+        {
+            "name": "Print",
+            "base": "Stmt",
+            "init_args": [["Expr*", "expression"]],
+            "functions": [
+                {
+                    "name": "nodeType",
+                    "returntype": "enum AST_NODE_TYPES",
+                    "body": "return AST_NODE_TYPES::STMT_PRINT;"
+                },
+                {
+                    "name": "accept",
+                    "returntype": "void",
+                    "args": [["StmtVisitor*", "visitor"]],
+                    "body": "return visitor->visit(this);"
+                }
+            ]
+        },
+        {
+            "name": "StmtVisitor",
+            "functions": [
+                {
+                    "name": "visit",
+                    "args": [["Print*", "printStmt"]],
+                    "returntype": "void",
+                    "virtual": "pure"
+                },
+                {
+                    "name": "visit",
+                    "args": [["Expression*", "exprStmt"]],
+                    "returntype": "void",
+                    "virtual": "pure"
+                }
+            ]
+        }
+    ]
+
+}
