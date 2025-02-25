@@ -12,6 +12,7 @@ public:
     Environment();
     void define(std::string, MyLang_Object* obj);
     MyLang_Object* get(Token* tk);
+    void assign(Token* tk, MyLang_Object* obj);
 
 };
 #endif

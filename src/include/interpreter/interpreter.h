@@ -17,6 +17,7 @@ public:
     virtual MyLang_Object* visit(Unary* unary);
     virtual MyLang_Object* visit(Binary* binary);
     virtual MyLang_Object* visit(Variable* variable);
+    virtual MyLang_Object* visit(Assign* assign);
     virtual void visit(Print* printStmt);
     virtual void visit(Expression* exprStmt);
     virtual void visit(Var* varStmt);

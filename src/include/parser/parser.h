@@ -18,6 +18,7 @@ public:
     Token* previous();
     Token* peek();
     Expr* getExpr();
+    Expr* getAssign();
     Expr* getEquality();
     Expr* getComparison();
     Expr* getTerm();

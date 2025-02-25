@@ -16,3 +16,10 @@ MyLang_Object *Environment::get(Token* tk)
         return (*(this->values))[tk->lexeme];
     throw myLang::RuntimeError(tk, "Undefined variable '"+tk->lexeme+"'.");
 }
+
+void Environment::assign(Token *tk, MyLang_Object *obj)
+{
+    if(this->values->find(tk->lexeme) != this->values->end())
+        (*(this->values))[tk->lexeme] = obj;
+    throw myLang::RuntimeError(tk, "Undefined variable '"+tk->lexeme+"'.");
+}

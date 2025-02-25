@@ -54,6 +54,15 @@ public:
     enum AST_NODE_TYPES nodeType();
 };
 
+class Assign: public Expr{
+public:
+    Token* name;
+    Expr* value;
+    Assign(Token* name,Expr* value);
+    virtual MyLang_Object* accept(ExprVisitor* visitor);
+    enum AST_NODE_TYPES nodeType();
+};
+
 class Binary: public Expr{
 public:
     Expr* left;
@@ -71,6 +80,7 @@ public:
     virtual MyLang_Object* visit(Grouping* grouping) = 0;
     virtual MyLang_Object* visit(Unary* unary) = 0;
     virtual MyLang_Object* visit(Variable* variable) = 0;
+    virtual MyLang_Object* visit(Assign* assign) = 0;
     virtual MyLang_Object* visit(Binary* binary) = 0;
 };
 

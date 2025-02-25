@@ -103,6 +103,12 @@ MyLang_Object *Interpreter::visit(Variable *variable)
     return env->get(variable->name);
 }
 
+MyLang_Object *Interpreter::visit(Assign *assign)
+{
+    MyLang_Object* val = evaluate(assign->value);
+    env->assign(assign->name, val);
+    return val;
+}
 void Interpreter::visit(Print *printStmt)
 {
     MyLang_Object* val = evaluate(printStmt->expression);
@@ -151,6 +157,8 @@ MyLang_Object *Interpreter::evaluate(Expr *expr)
             return ((Unary*)expr)->accept(this);
         case AST_NODE_TYPES::VARIABLE:
             return ((Variable*)expr)->accept(this);
+        case AST_NODE_TYPES::ASSIGN:
+            return ((Assign*)expr)->accept(this);
     }
     return NULL;
 }

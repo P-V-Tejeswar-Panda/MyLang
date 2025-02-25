@@ -9,7 +9,9 @@ declaration    → varDecl
 
 statement      → exprStmt
                | printStmt ;
-expression     → equality ;
+expression     → assignment ;
+assignment     → IDENTIFIER "=" assignment
+               | equality ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term           → factor ( ( "-" | "+" ) factor )* ;
@@ -86,8 +88,25 @@ Token *Parser::peek()
 
 Expr *Parser::getExpr()
 {
-    return getEquality();
+    return getAssign();
 }
+
+Expr *Parser::getAssign()
+{
+    Expr* exp = getEquality();
+    if(peek()->ttype == TokenType::EQUAL){
+        Token* eq = peek();
+        advance();
+        Expr* val = getAssign();
+        if(exp->nodeType() == AST_NODE_TYPES::STMT_VAR){
+            Token* name = ((Literal*)exp)->op;
+            return new Assign(name, val);
+        }
+        error(eq, "Invalid assignment target.");
+    }
+    return exp;
+}
+
 Expr *Parser::getEquality()
 {
     Expr* expr = getComparison();

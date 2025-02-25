@@ -55,6 +55,18 @@ enum AST_NODE_TYPES Variable::nodeType(){
 }
 
 
+Assign::Assign(Token* name,Expr* value){
+    this->name = name;
+    this->value = value;
+}
+MyLang_Object* Assign::accept(ExprVisitor* visitor){
+    return visitor->visit(this);
+}
+enum AST_NODE_TYPES Assign::nodeType(){
+    return AST_NODE_TYPES::ASSIGN;
+}
+
+
 Binary::Binary(Expr* left,Token* op,Expr* right){
     this->left = left;
     this->op = op;
