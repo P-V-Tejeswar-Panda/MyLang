@@ -5,64 +5,70 @@
 #include <parser/expr.h>
 
 
-ExprVisitor::ExprVisitor(){}
-
-
 Expr::Expr(){}
-// MyLang_Object* Expr::accept(ExprVisitor* visitor){
-//     return visitor->visit(this);
-// }
 
 
 Literal::Literal(Token* op){
     this->op = op;
 }
+MyLang_Object* Literal::accept(ExprVisitor* visitor){
+    return visitor->visit(this);
+}
 enum AST_NODE_TYPES Literal::nodeType(){
     return AST_NODE_TYPES::LITERAL;
 }
 
-MyLang_Object *Literal::accept(ExprVisitor *visitor)
-{
-    return visitor->visit(this);
-}
 
 Grouping::Grouping(Token* op,Expr* expr,Token* cp){
     this->op = op;
     this->expr = expr;
     this->cp = cp;
 }
+MyLang_Object* Grouping::accept(ExprVisitor* visitor){
+    return visitor->visit(this);
+}
 enum AST_NODE_TYPES Grouping::nodeType(){
     return AST_NODE_TYPES::GROUPING;
 }
 
-MyLang_Object *Grouping::accept(ExprVisitor *visitor)
-{
-    return visitor->visit(this);
-}
 
 Unary::Unary(Token* token,Expr* expr){
     this->token = token;
     this->expr = expr;
 }
+MyLang_Object* Unary::accept(ExprVisitor* visitor){
+    return visitor->visit(this);
+}
 enum AST_NODE_TYPES Unary::nodeType(){
     return AST_NODE_TYPES::UNARY;
 }
 
-MyLang_Object *Unary::accept(ExprVisitor *visitor)
-{
+
+Variable::Variable(Token* name){
+    this->name = name;
+}
+MyLang_Object* Variable::accept(ExprVisitor* visitor){
     return visitor->visit(this);
 }
+enum AST_NODE_TYPES Variable::nodeType(){
+    return AST_NODE_TYPES::VARIABLE;
+}
+
 
 Binary::Binary(Expr* left,Token* op,Expr* right){
     this->left = left;
     this->op = op;
     this->right = right;
 }
+MyLang_Object* Binary::accept(ExprVisitor* visitor){
+    return visitor->visit(this);
+}
 enum AST_NODE_TYPES Binary::nodeType(){
     return AST_NODE_TYPES::BINARY;
 }
 
-MyLang_Object *Binary::accept(ExprVisitor *visitor)
-{
-    return visitor->visit(this);
-}
+
+ExprVisitor::ExprVisitor(){}
+
+
+

@@ -29,6 +29,9 @@ public:
     Stmt* parsePrintStatement();
     Stmt* parseExpressionStatement();
 
+    Stmt* parseDeclaration();
+    Stmt* parseVarDeclaration();
+
     std::vector<Stmt*>* getAST();
 };
 #endif

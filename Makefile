@@ -1,7 +1,7 @@
 all: BUILD/myLang/myLang.out
 
-BUILD/myLang/myLang.out: BUILD/lexer/lex.yy.o BUILD/lexer/lexer.o BUILD/parser/parser.o BUILD/parser/expr.o BUILD/errors/errors.o BUILD/interpreter/interpreter.o BUILD/parser/stmt.o BUILD/myLang/main.o
-	g++ -g -I src/include BUILD/lexer/lexer.o BUILD/lexer/lex.yy.o BUILD/parser/parser.o BUILD/parser/expr.o BUILD/errors/errors.o BUILD/interpreter/interpreter.o BUILD/parser/stmt.o BUILD/myLang/main.o -o BUILD/myLang/myLang.out
+BUILD/myLang/myLang.out: BUILD/lexer/lex.yy.o BUILD/lexer/lexer.o BUILD/parser/parser.o BUILD/parser/expr.o BUILD/errors/errors.o BUILD/interpreter/interpreter.o BUILD/parser/stmt.o BUILD/environment/environment.o BUILD/myLang/main.o
+	g++ -g -I src/include BUILD/lexer/lexer.o BUILD/lexer/lex.yy.o BUILD/parser/parser.o BUILD/parser/expr.o BUILD/errors/errors.o BUILD/interpreter/interpreter.o BUILD/parser/stmt.o BUILD/environment/environment.o BUILD/myLang/main.o -o BUILD/myLang/myLang.out
 BUILD/myLang/main.o:
 	g++ -g -I src/include -c src/myLang/main.cpp -o BUILD/myLang/main.o
 BUILD/lexer/lex.yy.o: BUILD/lexer/lex.yy.c
@@ -20,6 +20,8 @@ BUILD/errors/errors.o:
 	g++ -g -I src/include -c src/errors/errors.cpp -o BUILD/errors/errors.o
 BUILD/interpreter/interpreter.o:
 	g++ -g -I src/include -c src/interpreter/interpreter.cpp -o BUILD/interpreter/interpreter.o
+BUILD/environment/environment.o:
+	g++ -g -I src/include -c src/environment/environment.cpp -o BUILD/environment/environment.o
 
 clean:
 	rm -f BUILD/myLang/*
@@ -27,3 +29,4 @@ clean:
 	rm -f BUILD/parser/*
 	rm -f BUILD/errors/*
 	rm -f BUILD/interpreter/*
+	rm -f BUILD/environment/*

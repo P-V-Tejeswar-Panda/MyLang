@@ -3,28 +3,17 @@
     "headerlocation": "/src/include/parser",
     "bodylocation": "/src/parser", 
     "headers": [
-        "lexer/token.h", "string", "parser/ast_node_types.h"
+        "lexer/token.h", "string", "parser/ast_node_types.h", "interpreter/myLang_types.h"
     ],
     "classes": [
-        {
-            "name": "ExprVisitor",
-            "functions": [
-                {
-                    "name": "visit",
-                    "args": [["Expr*", "expr"]],
-                    "returntype": "void",
-                    "virtual": "pure"
-                }
-            ]
-        },
         {
             "name": "Expr",
             "functions": [
                 {
                     "name": "accept",
                     "args": [["ExprVisitor*", "visitor"]],
-                    "body": "visitor->visit(this);",
-                    "returntype": "void"
+                    "virtual": "pure",
+                    "returntype": "MyLang_Object*"
                 },
                 {
                     "name": "nodeType",
@@ -39,6 +28,13 @@
             "init_args": [["Token*", "op"]],
             "functions": [
                 {
+                    "name": "accept",
+                    "args": [["ExprVisitor*", "visitor"]],
+                    "body": "return visitor->visit(this);",
+                    "virtual": "override",
+                    "returntype": "MyLang_Object*"
+                },
+                {
                     "name": "nodeType",
                     "returntype": "enum AST_NODE_TYPES",
                     "body": "return AST_NODE_TYPES::LITERAL;"
@@ -50,6 +46,13 @@
             "base": "Expr",
             "init_args": [["Token*", "op"],["Expr*", "expr"],["Token*", "cp"]],
             "functions": [
+                {
+                    "name": "accept",
+                    "args": [["ExprVisitor*", "visitor"]],
+                    "body": "return visitor->visit(this);",
+                    "virtual": "override",
+                    "returntype": "MyLang_Object*"
+                },
                 {
                     "name": "nodeType",
                     "returntype": "enum AST_NODE_TYPES",
@@ -63,9 +66,35 @@
             "init_args": [["Token*","token"],["Expr*", "expr"]],
             "functions": [
                 {
+                    "name": "accept",
+                    "args": [["ExprVisitor*", "visitor"]],
+                    "body": "return visitor->visit(this);",
+                    "virtual": "override",
+                    "returntype": "MyLang_Object*"
+                },
+                {
                     "name": "nodeType",
                     "returntype": "enum AST_NODE_TYPES",
                     "body": "return AST_NODE_TYPES::UNARY;"
+                }
+            ]
+        },
+        {
+            "name": "Variable",
+            "base": "Expr",
+            "init_args": [["Token*","name"]],
+            "functions": [
+                {
+                    "name": "accept",
+                    "args": [["ExprVisitor*", "visitor"]],
+                    "body": "return visitor->visit(this);",
+                    "virtual": "override",
+                    "returntype": "MyLang_Object*"
+                },
+                {
+                    "name": "nodeType",
+                    "returntype": "enum AST_NODE_TYPES",
+                    "body": "return AST_NODE_TYPES::VARIABLE;"
                 }
             ]
         },
@@ -75,9 +104,51 @@
             "init_args": [["Expr*", "left"], ["Token*", "op"], ["Expr*", "right"]],
             "functions": [
                 {
+                    "name": "accept",
+                    "args": [["ExprVisitor*", "visitor"]],
+                    "body": "return visitor->visit(this);",
+                    "virtual": "override",
+                    "returntype": "MyLang_Object*"
+                },
+                {
                     "name": "nodeType",
                     "returntype": "enum AST_NODE_TYPES",
                     "body": "return AST_NODE_TYPES::BINARY;"
+                }
+            ]
+        },
+        {
+            "name": "ExprVisitor",
+            "functions": [
+                {
+                    "name": "visit",
+                    "args": [["Literal*", "literal"]],
+                    "returntype": "MyLang_Object*",
+                    "virtual": "pure"
+                },
+                {
+                    "name": "visit",
+                    "args": [["Grouping*", "grouping"]],
+                    "returntype": "MyLang_Object*",
+                    "virtual": "pure"
+                },
+                {
+                    "name": "visit",
+                    "args": [["Unary*", "unary"]],
+                    "returntype": "MyLang_Object*",
+                    "virtual": "pure"
+                },
+                {
+                    "name": "visit",
+                    "args": [["Variable*", "variable"]],
+                    "returntype": "MyLang_Object*",
+                    "virtual": "pure"
+                },
+                {
+                    "name": "visit",
+                    "args": [["Binary*", "binary"]],
+                    "returntype": "MyLang_Object*",
+                    "virtual": "pure"
                 }
             ]
         }

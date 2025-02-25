@@ -137,8 +137,6 @@ class FuncGenerator(Generator):
         ret: str = ""
         if "virtual" in self.spec and self.spec["virtual"] == "pure":
             return ret
-        if "virtual" in self.spec:
-            ret += "virtual "
         if "returntype" in self.spec:
             ret += "%s "%(self.spec["returntype"])
         if self.className:
@@ -223,15 +221,25 @@ def generateSubClass(spec:str) -> str:
     return ret
 
 if __name__ == "__main__":
-    # print(generateBaseClass("Expr"))
-    # print(generateSubClass("Expr;Binary;left:Expr*;operator:Operator*;right:Expr*"))
-    # print(generateSubClass("Expr;Literal;ttype:enum TokenType;lexeme:str::string"))
-    # print(generateSubClass("Expr;Grouping;group:Expr*"))
-    # print(generateSubClass("Expr;Unary;ttype:enum TokenType;expr:Expr*"))
-    # print(generateSubClass("Expr;Operator;ttype:enum TokenType"))
-    spec_file_path = os.path.dirname(__file__)+"/stmt_spec.json"
+    if(len(sys.argv) < 3):
+        print(f"Usage: {sys.argv[0]} [header|body] class_spec.json")
+        exit(1)
+    if(sys.argv[1] is "header" or sys.argv[1] is "body"):
+        print(f"Usage: {sys.argv[0]} [header|body] class_spec.json")
+        print("The first argument should be: 'header' or 'body'")
+        exit(1)
+    if not sys.argv[2].endswith(".json"):
+        print(f"Usage: {sys.argv[0]} [header|body] class_spec.json")
+        print(f"class spec file, '{sys.argv[2]}' should be a json file.")
+        exit(1)
+    spec_file_path = os.path.dirname(__file__)+f"/{sys.argv[2]}"
+    if not os.path.exists(spec_file_path):
+        print(f"Doesn't exist: {spec_file_path}")
+        exit(1)
     with open(spec_file_path, "r") as spec_file:
         spec = json.load(spec_file)
-        #pprint(spec)
         fileGen = FileContentsGenerator(spec)
-        print(fileGen.generate())
+        if sys.argv[1] == "body":
+            print(fileGen.generate())
+        else:
+            print(fileGen.generateHeader())

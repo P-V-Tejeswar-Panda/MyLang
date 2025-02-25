@@ -23,8 +23,8 @@ class Literal: public Expr{
 public:
     Token* op;
     Literal(Token* op);
-    enum AST_NODE_TYPES nodeType();
     virtual MyLang_Object* accept(ExprVisitor* visitor);
+    enum AST_NODE_TYPES nodeType();
 };
 
 class Grouping: public Expr{
@@ -33,8 +33,8 @@ public:
     Expr* expr;
     Token* cp;
     Grouping(Token* op,Expr* expr,Token* cp);
-    enum AST_NODE_TYPES nodeType();
     virtual MyLang_Object* accept(ExprVisitor* visitor);
+    enum AST_NODE_TYPES nodeType();
 };
 
 class Unary: public Expr{
@@ -42,8 +42,16 @@ public:
     Token* token;
     Expr* expr;
     Unary(Token* token,Expr* expr);
-    enum AST_NODE_TYPES nodeType();
     virtual MyLang_Object* accept(ExprVisitor* visitor);
+    enum AST_NODE_TYPES nodeType();
+};
+
+class Variable: public Expr{
+public:
+    Token* name;
+    Variable(Token* name);
+    virtual MyLang_Object* accept(ExprVisitor* visitor);
+    enum AST_NODE_TYPES nodeType();
 };
 
 class Binary: public Expr{
@@ -52,17 +60,18 @@ public:
     Token* op;
     Expr* right;
     Binary(Expr* left,Token* op,Expr* right);
-    enum AST_NODE_TYPES nodeType();
     virtual MyLang_Object* accept(ExprVisitor* visitor);
+    enum AST_NODE_TYPES nodeType();
 };
 
 class ExprVisitor{
-    public:
-        ExprVisitor();
-        virtual MyLang_Object* visit(Literal* literal) = 0;
-        virtual MyLang_Object* visit(Grouping* grouping) = 0;
-        virtual MyLang_Object* visit(Unary* unary) = 0;
-        virtual MyLang_Object* visit(Binary* binary) = 0;
+public:
+    ExprVisitor();
+    virtual MyLang_Object* visit(Literal* literal) = 0;
+    virtual MyLang_Object* visit(Grouping* grouping) = 0;
+    virtual MyLang_Object* visit(Unary* unary) = 0;
+    virtual MyLang_Object* visit(Variable* variable) = 0;
+    virtual MyLang_Object* visit(Binary* binary) = 0;
 };
 
 #endif

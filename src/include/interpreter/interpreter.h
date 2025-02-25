@@ -5,18 +5,21 @@
 #include <parser/stmt.h>
 #include <lexer/token.h>
 #include <errors/errors.h>
+#include <environment/environment.h>
 #include <string>
 #include <vector>
 
 class Interpreter: public ExprVisitor, public StmtVisitor{
+    Environment* env;
 public:
-    //virtual MyLang_Object* visit(Expr* expr);
     virtual MyLang_Object* visit(Literal* literal);
     virtual MyLang_Object* visit(Grouping* grouping);
     virtual MyLang_Object* visit(Unary* unary);
     virtual MyLang_Object* visit(Binary* binary);
+    virtual MyLang_Object* visit(Variable* variable);
     virtual void visit(Print* printStmt);
     virtual void visit(Expression* exprStmt);
+    virtual void visit(Var* varStmt);
     virtual void interpret(std::vector<Stmt*>* stmts);
     virtual void execute(Stmt* stmt);
     virtual MyLang_Object* evaluate(Expr* expr);
@@ -25,5 +28,6 @@ public:
     virtual void checkNumberOperand(Token* op, MyLang_Object* operand);
     virtual void checkNumberOperands(Token* op, MyLang_Object* l_operand, MyLang_Object* r_operand);
     virtual std::string stringify(MyLang_Object* obj);
+    Interpreter();
 };
 #endif

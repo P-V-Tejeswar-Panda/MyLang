@@ -53,6 +53,24 @@
             ]
         },
         {
+            "name": "Var",
+            "base": "Stmt",
+            "init_args": [["Token*", "name"],["Expr*", "initializer"]],
+            "functions": [
+                {
+                    "name": "nodeType",
+                    "returntype": "enum AST_NODE_TYPES",
+                    "body": "return AST_NODE_TYPES::STMT_VAR;"
+                },
+                {
+                    "name": "accept",
+                    "returntype": "void",
+                    "args": [["StmtVisitor*", "visitor"]],
+                    "body": "return visitor->visit(this);"
+                }
+            ]
+        },
+        {
             "name": "StmtVisitor",
             "functions": [
                 {
@@ -64,6 +82,12 @@
                 {
                     "name": "visit",
                     "args": [["Expression*", "exprStmt"]],
+                    "returntype": "void",
+                    "virtual": "pure"
+                },
+                {
+                    "name": "visit",
+                    "args": [["Var*", "varStmt"]],
                     "returntype": "void",
                     "virtual": "pure"
                 }

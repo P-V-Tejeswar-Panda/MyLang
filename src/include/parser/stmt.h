@@ -33,11 +33,21 @@ public:
     void accept(StmtVisitor* visitor);
 };
 
+class Var: public Stmt{
+public:
+    Token* name;
+    Expr* initializer;
+    Var(Token* name,Expr* initializer);
+    enum AST_NODE_TYPES nodeType();
+    void accept(StmtVisitor* visitor);
+};
+
 class StmtVisitor{
 public:
     StmtVisitor();
     virtual void visit(Print* printStmt) = 0;
     virtual void visit(Expression* exprStmt) = 0;
+    virtual void visit(Var* varStmt) = 0;
 };
 
 #endif

@@ -2,6 +2,13 @@
 This expression parser implements A recursive descent parser for
 the following grammar.
 --------------------------------------------------------------
+program        → declaration* EOF ;
+
+declaration    → varDecl
+               | statement ;
+
+statement      → exprStmt
+               | printStmt ;
 expression     → equality ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
@@ -10,7 +17,8 @@ factor         → unary ( ( "/" | "*" ) unary )* ;
 unary          → ( "!" | "-" ) unary
                | primary ;
 primary        → NUMBER | STRING | "true" | "false" | "nil"
-               | "(" expression ")" ;
+               | "(" expression ")"
+               | IDENTIFIER ;
 --------------------------------------------------------------
 */
 #include <parser/parser.h>
@@ -36,8 +44,7 @@ myLang::ParseError *Parser::error(Token *tk, std::string msg)
 void Parser::synchronize()
 {
     // We will have the offending / unexpected token in the queue.
-    advance();
-    while(peek()){
+    while(peek()->ttype != TokenType::EOF_){
         if(peek()->ttype == SEMICOLON){
             advance();
             return;
@@ -193,6 +200,10 @@ Expr *Parser::getPrimary()
         exp = new Literal(t);
         advance();
     }
+    else if(t && (t->ttype == TokenType::IDENTIFIER)){
+        exp = new Variable(t);
+        advance();
+    }
     else
         throw error(t, "Expect expression.");
     return exp;
@@ -221,13 +232,47 @@ Stmt *Parser::parseExpressionStatement()
     advance();
     return new Expression(val);
 }
+
+Stmt *Parser::parseDeclaration()
+{
+    try{
+        if(peek()->ttype == TokenType::VAR){
+            advance();
+            return parseVarDeclaration();
+        }
+        return parseStatement();
+    } catch (myLang::ParseError* pe){
+        synchronize();
+        return NULL;
+    }
+}
+
+Stmt *Parser::parseVarDeclaration()
+{
+    Token* name = peek();
+    if(name->ttype != TokenType::IDENTIFIER){
+        throw error(name, "Expect variable name.");
+    }
+    advance();
+    Expr* initializer = NULL;
+    if(peek()->ttype == TokenType::EQUAL){
+        advance();
+        initializer = getExpr();
+    }
+    if(peek()->ttype != TokenType::SEMICOLON){
+        throw error(peek(), "Expect ';' at the end of variable declaration.");
+    }
+    advance();
+    return new Var(name, initializer);
+}
+
 std::vector<Stmt *> *Parser::getAST()
 {
     try
     {
         std::vector<Stmt*>* stmts = new std::vector<Stmt*>();
         while(peek()->ttype != TokenType::EOF_){
-            stmts->push_back(parseStatement());
+            stmts->push_back(parseDeclaration());
         }
         return stmts;
     }

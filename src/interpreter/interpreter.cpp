@@ -98,6 +98,11 @@ MyLang_Object *Interpreter::visit(Binary *binary)
     return NULL;
 }
 
+MyLang_Object *Interpreter::visit(Variable *variable)
+{
+    return env->get(variable->name);
+}
+
 void Interpreter::visit(Print *printStmt)
 {
     MyLang_Object* val = evaluate(printStmt->expression);
@@ -107,7 +112,14 @@ void Interpreter::visit(Expression *exprStmt)
 {
     evaluate(exprStmt->expression);
 }
-void Interpreter::interpret(std::vector<Stmt*>* stmts)
+void Interpreter::visit(Var *varStmt)
+{
+    MyLang_Object* value = NULL;
+    if(varStmt->initializer != NULL)
+        value = evaluate(varStmt->initializer);
+    env->define(varStmt->name->lexeme, value);
+}
+void Interpreter::interpret(std::vector<Stmt *> *stmts)
 {
     try{
         for(Stmt* stmt: (*stmts))
@@ -123,6 +135,8 @@ void Interpreter::execute(Stmt *stmt)
         ((Print*)stmt)->accept(this);
     if(stmt->nodeType() == AST_NODE_TYPES::STMT_EXPRESSION)
         ((Expression*)stmt)->accept(this);
+    if(stmt->nodeType() == AST_NODE_TYPES::STMT_VAR)
+        ((Var*)stmt)->accept(this);
 }
 MyLang_Object *Interpreter::evaluate(Expr *expr)
 {
@@ -135,6 +149,8 @@ MyLang_Object *Interpreter::evaluate(Expr *expr)
             return ((Literal*)expr)->accept(this);
         case AST_NODE_TYPES::UNARY:
             return ((Unary*)expr)->accept(this);
+        case AST_NODE_TYPES::VARIABLE:
+            return ((Variable*)expr)->accept(this);
     }
     return NULL;
 }
@@ -216,3 +232,7 @@ std::string Interpreter::stringify(MyLang_Object *obj)
     return "Error";
 }
 
+Interpreter::Interpreter()
+{
+    this->env = new Environment();
+}

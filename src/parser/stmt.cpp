@@ -30,6 +30,18 @@ void Print::accept(StmtVisitor* visitor){
 }
 
 
+Var::Var(Token* name,Expr* initializer){
+    this->name = name;
+    this->initializer = initializer;
+}
+enum AST_NODE_TYPES Var::nodeType(){
+    return AST_NODE_TYPES::STMT_VAR;
+}
+void Var::accept(StmtVisitor* visitor){
+    return visitor->visit(this);
+}
+
+
 StmtVisitor::StmtVisitor(){}
 
 
