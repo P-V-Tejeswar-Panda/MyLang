@@ -125,6 +125,10 @@ void Interpreter::visit(Var *varStmt)
         value = evaluate(varStmt->initializer);
     env->define(varStmt->name->lexeme, value);
 }
+void Interpreter::visit(Block *blkStmt)
+{
+    executeBlock(blkStmt->stmts, new Environment(this->env));
+}
 void Interpreter::interpret(std::vector<Stmt *> *stmts)
 {
     try{
@@ -143,6 +147,23 @@ void Interpreter::execute(Stmt *stmt)
         ((Expression*)stmt)->accept(this);
     if(stmt->nodeType() == AST_NODE_TYPES::STMT_VAR)
         ((Var*)stmt)->accept(this);
+    if(stmt->nodeType() == AST_NODE_TYPES::STMT_BLOCK)
+        ((Block*)stmt)->accept(this);
+}
+void Interpreter::executeBlock(std::vector<Stmt *> *stmts, Environment *env)
+{
+    Environment* prev = this->env;
+    try{
+        this->env = env;
+        for(Stmt* stmt: (*stmts)){
+            execute(stmt);
+        }
+    }
+    catch (myLang::RuntimeError* re){
+        this->env = prev;
+        throw re;
+    }
+    this->env = prev;
 }
 MyLang_Object *Interpreter::evaluate(Expr *expr)
 {

@@ -42,6 +42,17 @@ void Var::accept(StmtVisitor* visitor){
 }
 
 
+Block::Block(std::vector<Stmt*>* stmts){
+    this->stmts = stmts;
+}
+enum AST_NODE_TYPES Block::nodeType(){
+    return AST_NODE_TYPES::STMT_BLOCK;
+}
+void Block::accept(StmtVisitor* visitor){
+    return visitor->visit(this);
+}
+
+
 StmtVisitor::StmtVisitor(){}
 
 

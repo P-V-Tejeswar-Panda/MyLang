@@ -8,6 +8,7 @@
 #include <string>
 #include <parser/ast_node_types.h>
 #include <parser/expr.h>
+#include <vector>
 
 class StmtVisitor;
 
@@ -42,11 +43,20 @@ public:
     void accept(StmtVisitor* visitor);
 };
 
+class Block: public Stmt{
+public:
+    std::vector<Stmt*>* stmts;
+    Block(std::vector<Stmt*>* stmts);
+    enum AST_NODE_TYPES nodeType();
+    void accept(StmtVisitor* visitor);
+};
+
 class StmtVisitor{
 public:
     StmtVisitor();
     virtual void visit(Print* printStmt) = 0;
     virtual void visit(Expression* exprStmt) = 0;
+    virtual void visit(Block* blockStmt) = 0;
     virtual void visit(Var* varStmt) = 0;
 };
 

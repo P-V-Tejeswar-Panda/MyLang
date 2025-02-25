@@ -21,8 +21,10 @@ public:
     virtual void visit(Print* printStmt);
     virtual void visit(Expression* exprStmt);
     virtual void visit(Var* varStmt);
+    virtual void visit(Block* blkStmt);
     virtual void interpret(std::vector<Stmt*>* stmts);
     virtual void execute(Stmt* stmt);
+    virtual void executeBlock(std::vector<Stmt*>* stmts, Environment* env);
     virtual MyLang_Object* evaluate(Expr* expr);
     virtual bool  isTruthy(MyLang_Object* obj);
     virtual bool  isEqual(MyLang_Object* l, MyLang_Object* r);

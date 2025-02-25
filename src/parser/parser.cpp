@@ -9,6 +9,8 @@ declaration    → varDecl
 
 statement      → exprStmt
                | printStmt ;
+               | block ;
+block          → "{" declaration* "}" ;
 expression     → assignment ;
 assignment     → IDENTIFIER "=" assignment
                | equality ;
@@ -98,8 +100,8 @@ Expr *Parser::getAssign()
         Token* eq = peek();
         advance();
         Expr* val = getAssign();
-        if(exp->nodeType() == AST_NODE_TYPES::STMT_VAR){
-            Token* name = ((Literal*)exp)->op;
+        if(exp->nodeType() == AST_NODE_TYPES::VARIABLE){
+            Token* name = ((Variable*)exp)->name;
             return new Assign(name, val);
         }
         error(eq, "Invalid assignment target.");
@@ -232,6 +234,8 @@ Stmt *Parser::parseStatement()
 {
     if(peek()->ttype == TokenType::PRINT)
         return parsePrintStatement();
+    if(peek()->ttype == TokenType::LEFT_BRACE)
+        return new Block(parseBlock());
     return parseExpressionStatement();
 }
 Stmt *Parser::parsePrintStatement()
@@ -252,6 +256,21 @@ Stmt *Parser::parseExpressionStatement()
     return new Expression(val);
 }
 
+std::vector<Stmt *> *Parser::parseBlock()
+{
+    std::vector<Stmt*>* ret = new std::vector<Stmt*>();
+    advance();
+
+    while(peek()->ttype != TokenType::RIGHT_BRACE && peek()->ttype != TokenType::EOF_)
+    {
+        ret->push_back(parseDeclaration());
+    }
+
+    if(peek()->ttype != TokenType::RIGHT_BRACE)
+        throw error(peek(), "Expect '}' after block.");
+    advance();
+    return ret;
+}
 Stmt *Parser::parseDeclaration()
 {
     try{

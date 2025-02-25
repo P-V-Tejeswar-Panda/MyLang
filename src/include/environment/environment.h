@@ -8,8 +8,10 @@
 
 class Environment{
     std::unordered_map<std::string, MyLang_Object*>* values;
+    Environment* enclosingEnv;
 public:
     Environment();
+    Environment(Environment* enclosing);
     void define(std::string, MyLang_Object* obj);
     MyLang_Object* get(Token* tk);
     void assign(Token* tk, MyLang_Object* obj);

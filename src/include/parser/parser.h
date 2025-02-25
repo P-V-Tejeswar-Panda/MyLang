@@ -29,6 +29,7 @@ public:
     Stmt* parseStatement();
     Stmt* parsePrintStatement();
     Stmt* parseExpressionStatement();
+    std::vector<Stmt*>* parseBlock(); 
 
     Stmt* parseDeclaration();
     Stmt* parseVarDeclaration();
