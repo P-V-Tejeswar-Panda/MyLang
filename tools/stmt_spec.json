@@ -89,6 +89,25 @@
             ]
         },
         {
+            "name": "If",
+            "base": "Stmt",
+            "init_args": [["Expr*", "contition"],
+                          ["Stmt*", "thenBranch"], ["Stmt*", "elseBranch"]],
+            "functions": [
+                {
+                    "name": "nodeType",
+                    "returntype": "enum AST_NODE_TYPES",
+                    "body": "return AST_NODE_TYPES::STMT_IF;"
+                },
+                {
+                    "name": "accept",
+                    "returntype": "void",
+                    "args": [["StmtVisitor*", "visitor"]],
+                    "body": "return visitor->visit(this);"
+                }
+            ]
+        },
+        {
             "name": "StmtVisitor",
             "functions": [
                 {
@@ -106,6 +125,12 @@
                 {
                     "name": "visit",
                     "args": [["Block*", "blockStmt"]],
+                    "returntype": "void",
+                    "virtual": "pure"
+                },
+                {
+                    "name": "visit",
+                    "args": [["If*", "ifStmt"]],
                     "returntype": "void",
                     "virtual": "pure"
                 },

@@ -53,6 +53,19 @@ void Block::accept(StmtVisitor* visitor){
 }
 
 
+If::If(Expr* contition,Stmt* thenBranch,Stmt* elseBranch){
+    this->contition = contition;
+    this->thenBranch = thenBranch;
+    this->elseBranch = elseBranch;
+}
+enum AST_NODE_TYPES If::nodeType(){
+    return AST_NODE_TYPES::STMT_IF;
+}
+void If::accept(StmtVisitor* visitor){
+    return visitor->visit(this);
+}
+
+
 StmtVisitor::StmtVisitor(){}
 
 

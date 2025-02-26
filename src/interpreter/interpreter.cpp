@@ -129,6 +129,14 @@ void Interpreter::visit(Block *blkStmt)
 {
     executeBlock(blkStmt->stmts, new Environment(this->env));
 }
+void Interpreter::visit(If *ifStmt)
+{
+    if(isTruthy(evaluate(ifStmt->contition))){
+        execute(ifStmt->thenBranch);
+    }
+    else
+        execute(ifStmt->elseBranch);
+}
 void Interpreter::interpret(std::vector<Stmt *> *stmts)
 {
     try{
@@ -149,6 +157,8 @@ void Interpreter::execute(Stmt *stmt)
         ((Var*)stmt)->accept(this);
     if(stmt->nodeType() == AST_NODE_TYPES::STMT_BLOCK)
         ((Block*)stmt)->accept(this);
+    if(stmt->nodeType() == AST_NODE_TYPES::STMT_IF)
+        ((If*)stmt)->accept(this);
 }
 void Interpreter::executeBlock(std::vector<Stmt *> *stmts, Environment *env)
 {

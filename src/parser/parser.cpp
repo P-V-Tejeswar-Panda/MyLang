@@ -8,8 +8,11 @@ declaration    → varDecl
                | statement ;
 
 statement      → exprStmt
-               | printStmt ;
+               | printStmt
+               | ifStmt
                | block ;
+ifStmt         → "if" "(" expression ")" statement
+               ( "else" statement )?;
 block          → "{" declaration* "}" ;
 expression     → assignment ;
 assignment     → IDENTIFIER "=" assignment
@@ -236,6 +239,8 @@ Stmt *Parser::parseStatement()
         return parsePrintStatement();
     if(peek()->ttype == TokenType::LEFT_BRACE)
         return new Block(parseBlock());
+    if(peek()->ttype == TokenType::IF)
+        return parseIfStatement();
     return parseExpressionStatement();
 }
 Stmt *Parser::parsePrintStatement()
@@ -270,6 +275,26 @@ std::vector<Stmt *> *Parser::parseBlock()
         throw error(peek(), "Expect '}' after block.");
     advance();
     return ret;
+}
+Stmt *Parser::parseIfStatement()
+{
+    if(peek()->ttype != TokenType::IF)
+        throw error(peek(), "Expect 'if' at the beginning.");    // Not really necessary
+    advance();
+    if(peek()->ttype != TokenType::LEFT_PAREN)
+        throw error(peek(), "Expect '(' after if.");
+    advance();
+    Expr* if_cond = getExpr();
+    if(peek()->ttype != TokenType::RIGHT_PAREN)
+        throw error(peek(), "Expect ')' at the end of if condition.");
+    advance();
+    Stmt* if_body = parseStatement();
+    if(peek()->ttype == TokenType::ELSE){
+        advance();
+        Stmt* else_body = parseStatement();
+        return new If(if_cond, if_body, else_body);
+    }
+    return new If(if_cond, if_body, NULL);
 }
 Stmt *Parser::parseDeclaration()
 {

@@ -22,6 +22,7 @@ public:
     virtual void visit(Expression* exprStmt);
     virtual void visit(Var* varStmt);
     virtual void visit(Block* blkStmt);
+    virtual void visit(If* ifStmt);
     virtual void interpret(std::vector<Stmt*>* stmts);
     virtual void execute(Stmt* stmt);
     virtual void executeBlock(std::vector<Stmt*>* stmts, Environment* env);

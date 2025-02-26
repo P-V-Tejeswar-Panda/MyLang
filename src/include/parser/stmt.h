@@ -51,12 +51,23 @@ public:
     void accept(StmtVisitor* visitor);
 };
 
+class If: public Stmt{
+public:
+    Expr* contition;
+    Stmt* thenBranch;
+    Stmt* elseBranch;
+    If(Expr* contition,Stmt* thenBranch,Stmt* elseBranch);
+    enum AST_NODE_TYPES nodeType();
+    void accept(StmtVisitor* visitor);
+};
+
 class StmtVisitor{
 public:
     StmtVisitor();
     virtual void visit(Print* printStmt) = 0;
     virtual void visit(Expression* exprStmt) = 0;
     virtual void visit(Block* blockStmt) = 0;
+    virtual void visit(If* ifStmt) = 0;
     virtual void visit(Var* varStmt) = 0;
 };
 
