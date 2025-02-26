@@ -10,7 +10,10 @@ declaration    → varDecl
 statement      → exprStmt
                | printStmt
                | ifStmt
+               | whileStmt
                | block ;
+
+whileStmt      → "while" "(" expression ")" statement ;
 ifStmt         → "if" "(" expression ")" statement
                ( "else" statement )?;
 block          → "{" declaration* "}" ;
@@ -241,6 +244,8 @@ Stmt *Parser::parseStatement()
         return new Block(parseBlock());
     if(peek()->ttype == TokenType::IF)
         return parseIfStatement();
+    if(peek()->ttype == TokenType::WHILE)
+        return parseWhileStatement();
     return parseExpressionStatement();
 }
 Stmt *Parser::parsePrintStatement()
@@ -295,6 +300,21 @@ Stmt *Parser::parseIfStatement()
         return new If(if_cond, if_body, else_body);
     }
     return new If(if_cond, if_body, NULL);
+}
+Stmt *Parser::parseWhileStatement()
+{
+    if(peek()->ttype != TokenType::WHILE)
+        throw error(peek(), "Expect 'while' at the beginning.");    // Not really necessary
+    advance();
+    if(peek()->ttype != TokenType::LEFT_PAREN)
+        throw error(peek(), "Expect '(' after 'while'.");
+    advance();
+    Expr* while_cond = getExpr();
+    if(peek()->ttype != TokenType::RIGHT_PAREN)
+        throw error(peek(), "Expect ')' at the end of 'while' condition block.");
+    advance();
+    Stmt* while_body = parseStatement();
+    return new While(while_cond, while_body);
 }
 Stmt *Parser::parseDeclaration()
 {

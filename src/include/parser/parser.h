@@ -30,7 +30,8 @@ public:
     Stmt* parsePrintStatement();
     Stmt* parseExpressionStatement();
     std::vector<Stmt*>* parseBlock();
-    Stmt* parseIfStatement(); 
+    Stmt* parseIfStatement();
+    Stmt* parseWhileStatement(); 
 
     Stmt* parseDeclaration();
     Stmt* parseVarDeclaration();

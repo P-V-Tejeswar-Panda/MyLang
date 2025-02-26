@@ -61,6 +61,15 @@ public:
     void accept(StmtVisitor* visitor);
 };
 
+class While: public Stmt{
+public:
+    Expr* contition;
+    Stmt* whileBody;
+    While(Expr* contition,Stmt* whileBody);
+    enum AST_NODE_TYPES nodeType();
+    void accept(StmtVisitor* visitor);
+};
+
 class StmtVisitor{
 public:
     StmtVisitor();
@@ -68,6 +77,7 @@ public:
     virtual void visit(Expression* exprStmt) = 0;
     virtual void visit(Block* blockStmt) = 0;
     virtual void visit(If* ifStmt) = 0;
+    virtual void visit(While* whileStmt) = 0;
     virtual void visit(Var* varStmt) = 0;
 };
 

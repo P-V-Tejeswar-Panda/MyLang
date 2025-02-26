@@ -66,6 +66,18 @@ void If::accept(StmtVisitor* visitor){
 }
 
 
+While::While(Expr* contition,Stmt* whileBody){
+    this->contition = contition;
+    this->whileBody = whileBody;
+}
+enum AST_NODE_TYPES While::nodeType(){
+    return AST_NODE_TYPES::STMT_WHILE;
+}
+void While::accept(StmtVisitor* visitor){
+    return visitor->visit(this);
+}
+
+
 StmtVisitor::StmtVisitor(){}
 
 

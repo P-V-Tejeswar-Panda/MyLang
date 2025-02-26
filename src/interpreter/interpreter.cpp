@@ -137,6 +137,11 @@ void Interpreter::visit(If *ifStmt)
     else
         execute(ifStmt->elseBranch);
 }
+void Interpreter::visit(While *whileStmt)
+{
+    while(isTruthy(evaluate(whileStmt->contition)))
+        execute(whileStmt->whileBody);
+}
 void Interpreter::interpret(std::vector<Stmt *> *stmts)
 {
     try{
@@ -159,6 +164,8 @@ void Interpreter::execute(Stmt *stmt)
         ((Block*)stmt)->accept(this);
     if(stmt->nodeType() == AST_NODE_TYPES::STMT_IF)
         ((If*)stmt)->accept(this);
+    if(stmt->nodeType() == AST_NODE_TYPES::STMT_WHILE)
+        ((While*)stmt)->accept(this);
 }
 void Interpreter::executeBlock(std::vector<Stmt *> *stmts, Environment *env)
 {
