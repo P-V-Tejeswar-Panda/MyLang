@@ -109,6 +109,16 @@ MyLang_Object *Interpreter::visit(Assign *assign)
     env->assign(assign->name, val);
     return val;
 }
+MyLang_Object *Interpreter::visit(Logical *logical)
+{
+    MyLang_Object* left = evaluate(logical->left);
+    if(logical->op->ttype == TokenType::OR){
+        if(isTruthy(left)) return left;
+    }else{
+        if(!isTruthy(left)) return left;
+    }
+    return evaluate(logical->right);
+}
 void Interpreter::visit(Print *printStmt)
 {
     MyLang_Object* val = evaluate(printStmt->expression);
@@ -134,8 +144,10 @@ void Interpreter::visit(If *ifStmt)
     if(isTruthy(evaluate(ifStmt->contition))){
         execute(ifStmt->thenBranch);
     }
-    else
-        execute(ifStmt->elseBranch);
+    else{
+        if(ifStmt->elseBranch)
+            execute(ifStmt->elseBranch);
+    }
 }
 void Interpreter::visit(While *whileStmt)
 {
@@ -191,6 +203,8 @@ MyLang_Object *Interpreter::evaluate(Expr *expr)
             return ((Grouping*)expr)->accept(this);
         case AST_NODE_TYPES::LITERAL:
             return ((Literal*)expr)->accept(this);
+        case AST_NODE_TYPES::EXPR_LOGICAL:
+            return ((Logical*)expr)->accept(this);
         case AST_NODE_TYPES::UNARY:
             return ((Unary*)expr)->accept(this);
         case AST_NODE_TYPES::VARIABLE:

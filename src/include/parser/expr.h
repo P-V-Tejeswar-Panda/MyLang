@@ -27,6 +27,16 @@ public:
     enum AST_NODE_TYPES nodeType();
 };
 
+class Logical: public Expr{
+public:
+    Expr* left;
+    Token* op;
+    Expr* right;
+    Logical(Expr* left,Token* op,Expr* right);
+    virtual MyLang_Object* accept(ExprVisitor* visitor);
+    enum AST_NODE_TYPES nodeType();
+};
+
 class Grouping: public Expr{
 public:
     Token* op;
@@ -77,6 +87,7 @@ class ExprVisitor{
 public:
     ExprVisitor();
     virtual MyLang_Object* visit(Literal* literal) = 0;
+    virtual MyLang_Object* visit(Logical* logical) = 0;
     virtual MyLang_Object* visit(Grouping* grouping) = 0;
     virtual MyLang_Object* visit(Unary* unary) = 0;
     virtual MyLang_Object* visit(Variable* variable) = 0;

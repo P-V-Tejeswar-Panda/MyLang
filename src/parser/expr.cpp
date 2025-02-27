@@ -19,6 +19,19 @@ enum AST_NODE_TYPES Literal::nodeType(){
 }
 
 
+Logical::Logical(Expr* left,Token* op,Expr* right){
+    this->left = left;
+    this->op = op;
+    this->right = right;
+}
+MyLang_Object* Logical::accept(ExprVisitor* visitor){
+    return visitor->visit(this);
+}
+enum AST_NODE_TYPES Logical::nodeType(){
+    return AST_NODE_TYPES::EXPR_LOGICAL;
+}
+
+
 Grouping::Grouping(Token* op,Expr* expr,Token* cp){
     this->op = op;
     this->expr = expr;

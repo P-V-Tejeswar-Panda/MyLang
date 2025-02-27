@@ -25,6 +25,8 @@ public:
     Expr* getFactor();
     Expr* getUnary();
     Expr* getPrimary();
+    Expr* getOr();
+    Expr* getAnd();
 
     Stmt* parseStatement();
     Stmt* parsePrintStatement();

@@ -23,6 +23,8 @@ block          → "{" declaration* "}" ;
 expression     → assignment ;
 assignment     → IDENTIFIER "=" assignment
                | equality ;
+logical_or     → logical_and ("or" logical_and)*;
+logical_and    → equality ("and" equality)*;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term           → factor ( ( "-" | "+" ) factor )* ;
@@ -99,7 +101,7 @@ Token *Parser::peek()
 
 Expr *Parser::getExpr()
 {
-    return getAssign();
+    return getOr();
 }
 
 Expr *Parser::getAssign()
@@ -239,6 +241,16 @@ Expr *Parser::getPrimary()
     return exp;
 }
 
+Expr *Parser::getOr()
+{
+    Expr* left = getAnd();
+    while(peek()->ttype == TokenType::OR){
+        Token* tk = peek(); advance();
+        Expr* right = getAnd();
+        return new Logical(left, tk, right);
+    }
+    return left;
+}
 Stmt *Parser::parseStatement()
 {
     if(peek()->ttype == TokenType::PRINT)
@@ -252,6 +264,16 @@ Stmt *Parser::parseStatement()
     if(peek()->ttype == TokenType::FOR)
         return parseForStatement();
     return parseExpressionStatement();
+}
+Expr *Parser::getAnd()
+{
+    Expr* left = getAssign();
+    while(peek()->ttype == TokenType::AND){
+        Token* tk = peek(); advance();
+        Expr* right = getAssign();
+        return new Logical(left, tk, right);
+    }
+    return left;
 }
 Stmt *Parser::parsePrintStatement()
 {
