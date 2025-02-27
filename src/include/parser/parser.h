@@ -32,6 +32,7 @@ public:
     std::vector<Stmt*>* parseBlock();
     Stmt* parseIfStatement();
     Stmt* parseWhileStatement(); 
+    Stmt* parseForStatement();
 
     Stmt* parseDeclaration();
     Stmt* parseVarDeclaration();

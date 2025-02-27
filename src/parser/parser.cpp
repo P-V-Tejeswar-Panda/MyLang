@@ -11,8 +11,11 @@ statement      → exprStmt
                | printStmt
                | ifStmt
                | whileStmt
+               | forStmt
                | block ;
 
+forStmt        → "for" "(" (declaration|stmt)?;
+                        (expression)?; (expression)? ")" statement;
 whileStmt      → "while" "(" expression ")" statement ;
 ifStmt         → "if" "(" expression ")" statement
                ( "else" statement )?;
@@ -246,6 +249,8 @@ Stmt *Parser::parseStatement()
         return parseIfStatement();
     if(peek()->ttype == TokenType::WHILE)
         return parseWhileStatement();
+    if(peek()->ttype == TokenType::FOR)
+        return parseForStatement();
     return parseExpressionStatement();
 }
 Stmt *Parser::parsePrintStatement()
@@ -315,6 +320,52 @@ Stmt *Parser::parseWhileStatement()
     advance();
     Stmt* while_body = parseStatement();
     return new While(while_cond, while_body);
+}
+Stmt *Parser::parseForStatement()
+{
+    Stmt* forInit = NULL;
+    Expr* forCond = NULL;
+    Expr* forInc  = NULL;
+    Stmt* forBody = NULL;
+    if(peek()->ttype != TokenType::FOR)
+        throw error(peek(), "Expect 'for' at the beginning.");    // Not really necessary
+    advance();
+    if(peek()->ttype != TokenType::LEFT_PAREN)
+        throw error(peek(), "Expect '(' after 'while'.");
+    advance();
+    if(peek()->ttype != TokenType::SEMICOLON)
+        forInit = parseDeclaration();
+    else
+        advance();
+    if(peek()->ttype != TokenType::SEMICOLON)
+        forCond = getExpr();
+    if(peek()->ttype != TokenType::SEMICOLON)
+        throw error(peek(), "Expect ';' after 'for' check statement.");
+    advance();
+    if(peek()->ttype != TokenType::RIGHT_PAREN)
+        forInc = getExpr();
+    if(peek()->ttype != TokenType::RIGHT_PAREN)
+        throw error(peek(), "Expect ')' after 'for' loop increment statement.");
+    advance();
+    forBody = parseStatement();
+    std::vector<Stmt*>* stmts = new std::vector<Stmt*>();
+    std::vector<Stmt*>* whileBody = new std::vector<Stmt*>();
+    While* whBlk = NULL;
+    if(forInc){
+        whileBody->push_back(forBody);
+        whileBody->push_back(new Expression(forInc));
+        forBody = new Block(whileBody);
+    }
+    if(forCond)
+        whBlk = new While(forCond, forBody);
+    else
+        whBlk = new While(new Literal(new Token(TokenType::TRUE, "true", -1)), forBody);
+    if(forInit){
+        stmts->push_back(forInit);
+        stmts->push_back(whBlk);
+        return new Block(stmts);
+    }
+    return whBlk;
 }
 Stmt *Parser::parseDeclaration()
 {
