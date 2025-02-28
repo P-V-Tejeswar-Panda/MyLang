@@ -489,7 +489,8 @@ Stmt *Parser::parseFuncDeclaration(std::string kind)
     }
     while(match(TokenType::COMMA));
     consume(TokenType::RIGHT_PAREN, "Expect ')' after parameters.");
-    consume(TokenType::LEFT_BRACE, "Expect '{' before "+kind+" body.");
+    if(peek()->ttype != TokenType::LEFT_BRACE)
+        throw error(peek(), "Expect '{' before "+kind+" body.");
     std::vector<Stmt*>* body = parseBlock();
     return new Function(name, params, body);
 }

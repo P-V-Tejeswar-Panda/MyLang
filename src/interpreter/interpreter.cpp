@@ -199,6 +199,8 @@ void Interpreter::execute(Stmt *stmt)
         ((If*)stmt)->accept(this);
     if(stmt->nodeType() == AST_NODE_TYPES::STMT_WHILE)
         ((While*)stmt)->accept(this);
+    if(stmt->nodeType() == AST_NODE_TYPES::DEFN_FUNC)
+        ((Function*)stmt)->accept(this);
 }
 void Interpreter::executeBlock(std::vector<Stmt *> *stmts, Environment *env)
 {
