@@ -3,7 +3,7 @@
     "headerlocation": "/src/include/parser",
     "bodylocation": "/src/parser", 
     "headers": [
-        "lexer/token.h", "string", "parser/ast_node_types.h", "interpreter/myLang_types.h"
+        "lexer/token.h", "string", "parser/ast_node_types.h", "interpreter/myLang_types.h", "vector"
     ],
     "classes": [
         {
@@ -156,6 +156,25 @@
             ]
         },
         {
+            "name": "FuncCall",
+            "base": "Expr",
+            "init_args": [["Expr*", "callee"], ["Token*", "paren"], ["std::vector<Expr*>*", "args"]],
+            "functions": [
+                {
+                    "name": "accept",
+                    "args": [["ExprVisitor*", "visitor"]],
+                    "body": "return visitor->visit(this);",
+                    "virtual": "override",
+                    "returntype": "MyLang_Object*"
+                },
+                {
+                    "name": "nodeType",
+                    "returntype": "enum AST_NODE_TYPES",
+                    "body": "return AST_NODE_TYPES::EXPR_FUNC_CALL;"
+                }
+            ]
+        },
+        {
             "name": "ExprVisitor",
             "functions": [
                 {
@@ -185,6 +204,12 @@
                 {
                     "name": "visit",
                     "args": [["Variable*", "variable"]],
+                    "returntype": "MyLang_Object*",
+                    "virtual": "pure"
+                },
+                {
+                    "name": "visit",
+                    "args": [["FuncCall*", "funcCall"]],
                     "returntype": "MyLang_Object*",
                     "virtual": "pure"
                 },

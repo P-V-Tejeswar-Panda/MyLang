@@ -93,6 +93,19 @@ enum AST_NODE_TYPES Binary::nodeType(){
 }
 
 
+FuncCall::FuncCall(Expr* callee,Token* paren,std::vector<Expr*>* args){
+    this->callee = callee;
+    this->paren = paren;
+    this->args = args;
+}
+MyLang_Object* FuncCall::accept(ExprVisitor* visitor){
+    return visitor->visit(this);
+}
+enum AST_NODE_TYPES FuncCall::nodeType(){
+    return AST_NODE_TYPES::EXPR_FUNC_CALL;
+}
+
+
 ExprVisitor::ExprVisitor(){}
 
 

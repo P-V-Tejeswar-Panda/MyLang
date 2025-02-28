@@ -6,12 +6,16 @@
 #include <lexer/token.h>
 #include <errors/errors.h>
 #include <environment/environment.h>
+#include <callable/callable.h>
+#include <callable/native.h>
+#include <callable/userdefined.h>
 #include <string>
 #include <vector>
 
 class Interpreter: public ExprVisitor, public StmtVisitor{
-    Environment* env;
 public:
+    Environment* env;
+    Environment* globals;
     virtual MyLang_Object* visit(Literal* literal);
     virtual MyLang_Object* visit(Grouping* grouping);
     virtual MyLang_Object* visit(Unary* unary);
@@ -19,12 +23,14 @@ public:
     virtual MyLang_Object* visit(Variable* variable);
     virtual MyLang_Object* visit(Assign* assign);
     virtual MyLang_Object* visit(Logical* logical);
+    virtual MyLang_Object* visit(FuncCall* funcCall);
     virtual void visit(Print* printStmt);
     virtual void visit(Expression* exprStmt);
     virtual void visit(Var* varStmt);
     virtual void visit(Block* blkStmt);
     virtual void visit(If* ifStmt);
     virtual void visit(While* whileStmt);
+    virtual void visit(Function* funcDecl);
     virtual void interpret(std::vector<Stmt*>* stmts);
     virtual void execute(Stmt* stmt);
     virtual void executeBlock(std::vector<Stmt*>* stmts, Environment* env);

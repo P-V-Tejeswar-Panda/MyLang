@@ -3,7 +3,7 @@
 #include <string>
 
 enum MyLang_object_type{
-    MYLANG_OBJECT, MYLANG_BOOLEAN, MYLANG_DOUBLE, MYLANG_STRING
+    MYLANG_OBJECT, MYLANG_BOOLEAN, MYLANG_DOUBLE, MYLANG_STRING, MYLANG_CALLABLE
 };
 class MyLang_Object{
 protected:

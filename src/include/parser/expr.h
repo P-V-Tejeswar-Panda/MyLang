@@ -8,6 +8,7 @@
 #include <string>
 #include <parser/ast_node_types.h>
 #include <interpreter/myLang_types.h>
+#include <vector>
 
 class ExprVisitor;
 
@@ -83,6 +84,16 @@ public:
     enum AST_NODE_TYPES nodeType();
 };
 
+class FuncCall: public Expr{
+public:
+    Expr* callee;
+    Token* paren;
+    std::vector<Expr*>* args;
+    FuncCall(Expr* callee,Token* paren,std::vector<Expr*>* args);
+    virtual MyLang_Object* accept(ExprVisitor* visitor);
+    enum AST_NODE_TYPES nodeType();
+};
+
 class ExprVisitor{
 public:
     ExprVisitor();
@@ -91,6 +102,7 @@ public:
     virtual MyLang_Object* visit(Grouping* grouping) = 0;
     virtual MyLang_Object* visit(Unary* unary) = 0;
     virtual MyLang_Object* visit(Variable* variable) = 0;
+    virtual MyLang_Object* visit(FuncCall* funcCall) = 0;
     virtual MyLang_Object* visit(Assign* assign) = 0;
     virtual MyLang_Object* visit(Binary* binary) = 0;
 };

@@ -5,8 +5,11 @@ the following grammar.
 program        → declaration* EOF ;
 
 declaration    → varDecl
-               | statement ;
-
+               | statement
+               | funcDecl ;
+funcDecl       → "func" function;
+function       → IDENTIFIER "(" parameters ")" block ;
+parameters     → IDENTIFIER ("," IDENTIFIER)* ;
 statement      → exprStmt
                | printStmt
                | ifStmt
@@ -30,10 +33,12 @@ comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term           → factor ( ( "-" | "+" ) factor )* ;
 factor         → unary ( ( "/" | "*" ) unary )* ;
 unary          → ( "!" | "-" ) unary
-               | primary ;
+               | call ;
+call           → primary ("(" arguments? ")")* ;
 primary        → NUMBER | STRING | "true" | "false" | "nil"
                | "(" expression ")"
                | IDENTIFIER ;
+arguments      → expression ("," expression)* ;
 --------------------------------------------------------------
 */
 #include <parser/parser.h>
@@ -97,6 +102,29 @@ Token *Parser::peek()
     if(this->currentPos >= this->tokens->size())
         return NULL;
     return this->getTokenAt(this->currentPos);
+}
+
+Token *Parser::match(enum TokenType ntype)
+{
+    Token* ret = NULL;
+    if(peek()->ttype == ntype){
+        ret = peek();
+        advance();
+    }
+    return ret;
+}
+
+Token *Parser::consume(TokenType ntype, std::string msg)
+{
+    Token* ret = NULL;
+    if(peek()->ttype == ntype){
+        ret = peek();
+        advance();
+    }
+    else{
+        throw error(peek(), msg);
+    }
+    return ret;
 }
 
 Expr *Parser::getExpr()
@@ -202,7 +230,7 @@ Expr *Parser::getUnary()
         exp = new Unary(t, exp);
     }
     else{
-        exp = getPrimary();
+        exp = getFuncCall();
     }
     return exp;
 }
@@ -274,6 +302,29 @@ Expr *Parser::getAnd()
         return new Logical(left, tk, right);
     }
     return left;
+}
+Expr *Parser::getFuncCall()
+{
+    Expr* exp = getPrimary();
+    while(match(TokenType::LEFT_PAREN)){
+        std::vector<Expr*>* args = new std::vector<Expr*>();
+        if(peek()->ttype == TokenType::RIGHT_PAREN){
+            exp = new FuncCall(exp, peek(), args);
+            advance();
+            continue;
+        }
+        do{
+            if(args->size() >= 255)
+                error(peek(), "Not more than 255 arguments is allowed!");
+            args->push_back(getExpr());
+        }
+        while(match(TokenType::COMMA));
+        if(peek()->ttype != TokenType::RIGHT_PAREN)
+            throw error(peek(), "Expect ')' after arguments in function call.");
+        exp = new FuncCall(exp, peek(), args);
+        advance();
+    }
+    return exp;
 }
 Stmt *Parser::parsePrintStatement()
 {
@@ -396,6 +447,8 @@ Stmt *Parser::parseDeclaration()
             advance();
             return parseVarDeclaration();
         }
+        if(match(TokenType::FUN))
+            return parseFuncDeclaration("function");
         return parseStatement();
     } catch (myLang::ParseError* pe){
         synchronize();
@@ -422,6 +475,24 @@ Stmt *Parser::parseVarDeclaration()
     return new Var(name, initializer);
 }
 
+Stmt *Parser::parseFuncDeclaration(std::string kind)
+{
+    Token* name = consume(TokenType::IDENTIFIER, "Expect "+kind+" name.");
+    if(!match(TokenType::LEFT_PAREN))
+        throw error(peek(), "Expect '(' after "+kind+" name.");
+    std::vector<Token*>* params = new std::vector<Token*>();
+    do{
+        if(params->size() >= 255){
+            error(peek(), "Can't have more than 255 parameters");
+        }
+        params->push_back(consume(TokenType::IDENTIFIER, "Expect parameter name."));
+    }
+    while(match(TokenType::COMMA));
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after parameters.");
+    consume(TokenType::LEFT_BRACE, "Expect '{' before "+kind+" body.");
+    std::vector<Stmt*>* body = parseBlock();
+    return new Function(name, params, body);
+}
 std::vector<Stmt *> *Parser::getAST()
 {
     try

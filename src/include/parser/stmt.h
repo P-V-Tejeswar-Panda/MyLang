@@ -70,6 +70,16 @@ public:
     void accept(StmtVisitor* visitor);
 };
 
+class Function: public Stmt{
+public:
+    Token* name;
+    std::vector<Token*>* params;
+    std::vector<Stmt*>* body;
+    Function(Token* name,std::vector<Token*>* params,std::vector<Stmt*>* body);
+    enum AST_NODE_TYPES nodeType();
+    void accept(StmtVisitor* visitor);
+};
+
 class StmtVisitor{
 public:
     StmtVisitor();
@@ -77,6 +87,7 @@ public:
     virtual void visit(Expression* exprStmt) = 0;
     virtual void visit(Block* blockStmt) = 0;
     virtual void visit(If* ifStmt) = 0;
+    virtual void visit(Function* funcDecl) = 0;
     virtual void visit(While* whileStmt) = 0;
     virtual void visit(Var* varStmt) = 0;
 };

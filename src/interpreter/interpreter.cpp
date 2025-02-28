@@ -119,6 +119,22 @@ MyLang_Object *Interpreter::visit(Logical *logical)
     }
     return evaluate(logical->right);
 }
+MyLang_Object *Interpreter::visit(FuncCall *funcCall)
+{
+    MyLang_Object* callee = evaluate(funcCall->callee);
+    std::vector<MyLang_Object*>* args = new std::vector<MyLang_Object*>();
+    for(Expr* exp : *(funcCall->args))
+        args->push_back(evaluate(exp));
+    if(callee->getType() != MyLang_object_type::MYLANG_CALLABLE)
+        throw new myLang::RuntimeError(funcCall->paren,
+                                        "Can only call functions and classes.");
+    MyLangCallable* func = (MyLangCallable*) callee;
+    if(args->size() != func->arity())
+        throw new myLang::RuntimeError(funcCall->paren,
+            "Expected: "+ std::to_string(func->arity())
+            +" arguments but got "+ std::to_string(args->size()));
+    return func->call(this, args);
+}
 void Interpreter::visit(Print *printStmt)
 {
     MyLang_Object* val = evaluate(printStmt->expression);
@@ -153,6 +169,11 @@ void Interpreter::visit(While *whileStmt)
 {
     while(isTruthy(evaluate(whileStmt->contition)))
         execute(whileStmt->whileBody);
+}
+void Interpreter::visit(Function *funcDecl)
+{
+    UserDefinedFunc *uFunc = new UserDefinedFunc(funcDecl);
+    env->define(funcDecl->name->lexeme, uFunc);
 }
 void Interpreter::interpret(std::vector<Stmt *> *stmts)
 {
@@ -211,6 +232,8 @@ MyLang_Object *Interpreter::evaluate(Expr *expr)
             return ((Variable*)expr)->accept(this);
         case AST_NODE_TYPES::ASSIGN:
             return ((Assign*)expr)->accept(this);
+        case AST_NODE_TYPES::EXPR_FUNC_CALL:
+            return ((FuncCall*)expr)->accept(this);
     }
     return NULL;
 }
@@ -294,5 +317,7 @@ std::string Interpreter::stringify(MyLang_Object *obj)
 
 Interpreter::Interpreter()
 {
-    this->env = new Environment();
+    this->globals = new Environment();
+    this->env = globals;
+    this->globals->define("clock", new Clock());
 }

@@ -78,6 +78,19 @@ void While::accept(StmtVisitor* visitor){
 }
 
 
+Function::Function(Token* name,std::vector<Token*>* params,std::vector<Stmt*>* body){
+    this->name = name;
+    this->params = params;
+    this->body = body;
+}
+enum AST_NODE_TYPES Function::nodeType(){
+    return AST_NODE_TYPES::DEFN_FUNC;
+}
+void Function::accept(StmtVisitor* visitor){
+    return visitor->visit(this);
+}
+
+
 StmtVisitor::StmtVisitor(){}
 
 

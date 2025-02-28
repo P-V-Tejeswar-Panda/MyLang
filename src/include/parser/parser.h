@@ -17,6 +17,8 @@ public:
     void advance();
     Token* previous();
     Token* peek();
+    Token* match(enum TokenType ntype);
+    Token* consume(enum TokenType ntype, std::string msg);
     Expr* getExpr();
     Expr* getAssign();
     Expr* getEquality();
@@ -27,6 +29,7 @@ public:
     Expr* getPrimary();
     Expr* getOr();
     Expr* getAnd();
+    Expr* getFuncCall();
 
     Stmt* parseStatement();
     Stmt* parsePrintStatement();
@@ -38,6 +41,7 @@ public:
 
     Stmt* parseDeclaration();
     Stmt* parseVarDeclaration();
+    Stmt* parseFuncDeclaration(std::string kind);
 
     std::vector<Stmt*>* getAST();
 };
