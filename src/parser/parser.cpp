@@ -291,6 +291,8 @@ Stmt *Parser::parseStatement()
         return parseWhileStatement();
     if(peek()->ttype == TokenType::FOR)
         return parseForStatement();
+    if(peek()->ttype == TokenType::RETURN)
+        return parseReturnStatement();
     return parseExpressionStatement();
 }
 Expr *Parser::getAnd()
@@ -439,6 +441,15 @@ Stmt *Parser::parseForStatement()
         return new Block(stmts);
     }
     return whBlk;
+}
+Stmt *Parser::parseReturnStatement()
+{
+    Token* ret_token = consume(TokenType::RETURN, "Expect 'return' at the beginning of return statement.");
+    Expr* exp = NULL;
+    if(peek()->ttype != TokenType::SEMICOLON)
+        exp = getExpr();
+    consume(TokenType::SEMICOLON, "Expect ';' at the end of return statement.");
+    return new Return(ret_token, exp);
 }
 Stmt *Parser::parseDeclaration()
 {

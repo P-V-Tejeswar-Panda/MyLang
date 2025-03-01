@@ -16,7 +16,11 @@ MyLang_Object *UserDefinedFunc::call(Interpreter *ipreter, std::vector<MyLang_Ob
     for(int i = 0; i < funcDefn->params->size(); i++){
         funcEnv->define((*(funcDefn->params))[i]->lexeme, (*args)[i]);
     }
-    ipreter->executeBlock(funcDefn->body, funcEnv);
+    try{
+        ipreter->executeBlock(funcDefn->body, funcEnv);
+    }catch(myLang::ReturnExp* exp){
+        return exp->val;
+    }
     return NULL;
 }
 

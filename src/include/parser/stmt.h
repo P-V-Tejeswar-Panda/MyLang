@@ -80,6 +80,15 @@ public:
     void accept(StmtVisitor* visitor);
 };
 
+class Return: public Stmt{
+public:
+    Token* ret_token;
+    Expr* exp;
+    Return(Token* ret_token,Expr* exp);
+    enum AST_NODE_TYPES nodeType();
+    void accept(StmtVisitor* visitor);
+};
+
 class StmtVisitor{
 public:
     StmtVisitor();
@@ -89,6 +98,7 @@ public:
     virtual void visit(If* ifStmt) = 0;
     virtual void visit(Function* funcDecl) = 0;
     virtual void visit(While* whileStmt) = 0;
+    virtual void visit(Return* returnStmt) = 0;
     virtual void visit(Var* varStmt) = 0;
 };
 

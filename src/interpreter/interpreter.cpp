@@ -175,6 +175,13 @@ void Interpreter::visit(Function *funcDecl)
     UserDefinedFunc *uFunc = new UserDefinedFunc(funcDecl);
     env->define(funcDecl->name->lexeme, uFunc);
 }
+void Interpreter::visit(Return *retStmt)
+{
+    MyLang_Object* obj = NULL;
+    if(retStmt->exp != NULL)
+        obj = evaluate(retStmt->exp);
+    throw new myLang::ReturnExp(obj);
+}
 void Interpreter::interpret(std::vector<Stmt *> *stmts)
 {
     try{
@@ -201,6 +208,9 @@ void Interpreter::execute(Stmt *stmt)
         ((While*)stmt)->accept(this);
     if(stmt->nodeType() == AST_NODE_TYPES::DEFN_FUNC)
         ((Function*)stmt)->accept(this);
+    if(stmt->nodeType() == AST_NODE_TYPES::STMT_RET)
+        ((Return*)stmt)->accept(this);
+    
 }
 void Interpreter::executeBlock(std::vector<Stmt *> *stmts, Environment *env)
 {
@@ -210,6 +220,10 @@ void Interpreter::executeBlock(std::vector<Stmt *> *stmts, Environment *env)
         for(Stmt* stmt: (*stmts)){
             execute(stmt);
         }
+    }
+    catch (myLang::ReturnExp* re){
+        this->env = prev;
+        throw re;
     }
     catch (myLang::RuntimeError* re){
         this->env = prev;

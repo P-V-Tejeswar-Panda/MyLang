@@ -33,4 +33,9 @@ void communicateRuntimeError(RuntimeError *err)
 void report(std::string msg){
     std::cout << msg << std::endl;
 }
+ReturnExp::ReturnExp(MyLang_Object *obj)
+{
+    this->val = obj;
+}
+
 }

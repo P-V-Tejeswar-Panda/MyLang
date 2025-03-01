@@ -38,6 +38,7 @@ public:
     Stmt* parseIfStatement();
     Stmt* parseWhileStatement(); 
     Stmt* parseForStatement();
+    Stmt* parseReturnStatement();
 
     Stmt* parseDeclaration();
     Stmt* parseVarDeclaration();

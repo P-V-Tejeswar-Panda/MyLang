@@ -31,6 +31,7 @@ public:
     virtual void visit(If* ifStmt);
     virtual void visit(While* whileStmt);
     virtual void visit(Function* funcDecl);
+    virtual void visit(Return* retStmt);
     virtual void interpret(std::vector<Stmt*>* stmts);
     virtual void execute(Stmt* stmt);
     virtual void executeBlock(std::vector<Stmt*>* stmts, Environment* env);

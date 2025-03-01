@@ -91,6 +91,18 @@ void Function::accept(StmtVisitor* visitor){
 }
 
 
+Return::Return(Token* ret_token,Expr* exp){
+    this->ret_token = ret_token;
+    this->exp = exp;
+}
+enum AST_NODE_TYPES Return::nodeType(){
+    return AST_NODE_TYPES::STMT_RET;
+}
+void Return::accept(StmtVisitor* visitor){
+    return visitor->visit(this);
+}
+
+
 StmtVisitor::StmtVisitor(){}
 
 

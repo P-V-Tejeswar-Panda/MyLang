@@ -4,6 +4,7 @@
 #include <interpreter/interpreter.h>
 #include <parser/stmt.h>
 #include <environment/environment.h>
+#include <errors/errors.h>
 
 
 class UserDefinedFunc: public MyLangCallable{
