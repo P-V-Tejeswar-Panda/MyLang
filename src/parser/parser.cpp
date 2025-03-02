@@ -489,17 +489,19 @@ Stmt *Parser::parseVarDeclaration()
 Stmt *Parser::parseFuncDeclaration(std::string kind)
 {
     Token* name = consume(TokenType::IDENTIFIER, "Expect "+kind+" name.");
-    if(!match(TokenType::LEFT_PAREN))
-        throw error(peek(), "Expect '(' after "+kind+" name.");
+    consume(TokenType::LEFT_PAREN, "Expect '(' after "+kind+" name.");
     std::vector<Token*>* params = new std::vector<Token*>();
-    do{
-        if(params->size() >= 255){
-            error(peek(), "Can't have more than 255 parameters");
+    if(!match(TokenType::RIGHT_PAREN)){
+        do{
+            if(params->size() >= 255){
+                error(peek(), "Can't have more than 255 parameters");
+            }
+            params->push_back(consume(TokenType::IDENTIFIER, "Expect parameter name."));
         }
-        params->push_back(consume(TokenType::IDENTIFIER, "Expect parameter name."));
+        while(match(TokenType::COMMA));   
+        consume(TokenType::RIGHT_PAREN, "Expect ')' after parameters.");
     }
-    while(match(TokenType::COMMA));
-    consume(TokenType::RIGHT_PAREN, "Expect ')' after parameters.");
+    // parse block expects the current token to be pointing to '{'
     if(peek()->ttype != TokenType::LEFT_BRACE)
         throw error(peek(), "Expect '{' before "+kind+" body.");
     std::vector<Stmt*>* body = parseBlock();

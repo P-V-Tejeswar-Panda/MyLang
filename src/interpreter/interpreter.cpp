@@ -172,7 +172,7 @@ void Interpreter::visit(While *whileStmt)
 }
 void Interpreter::visit(Function *funcDecl)
 {
-    UserDefinedFunc *uFunc = new UserDefinedFunc(funcDecl);
+    UserDefinedFunc *uFunc = new UserDefinedFunc(funcDecl, this->env);
     env->define(funcDecl->name->lexeme, uFunc);
 }
 void Interpreter::visit(Return *retStmt)

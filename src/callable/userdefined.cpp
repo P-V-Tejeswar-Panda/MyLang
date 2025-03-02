@@ -1,9 +1,10 @@
 #include <callable/userdefined.h>
 
 
-UserDefinedFunc::UserDefinedFunc(Function *func)
+UserDefinedFunc::UserDefinedFunc(Function *func, Environment* closure)
 {
     funcDefn = func;
+    this->closure = closure;
 }
 int UserDefinedFunc::arity()
 {
@@ -12,7 +13,7 @@ int UserDefinedFunc::arity()
 
 MyLang_Object *UserDefinedFunc::call(Interpreter *ipreter, std::vector<MyLang_Object *> *args)
 {
-    Environment* funcEnv = new Environment(ipreter->globals);
+    Environment* funcEnv = new Environment(this->closure);
     for(int i = 0; i < funcDefn->params->size(); i++){
         funcEnv->define((*(funcDefn->params))[i]->lexeme, (*args)[i]);
     }

@@ -9,8 +9,9 @@
 
 class UserDefinedFunc: public MyLangCallable{
     Function* funcDefn;
+    Environment* closure;
 public:
-    UserDefinedFunc(Function* func);
+    UserDefinedFunc(Function* func, Environment* closure);
     virtual int arity() override;
     virtual MyLang_Object* call(Interpreter* ipreter, std::vector<MyLang_Object*>* args) override;
     virtual MyLang_object_type getType() override;
