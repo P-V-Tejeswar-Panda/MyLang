@@ -4,6 +4,7 @@
 #include <interpreter/interpreter.h>
 #include <myLang/globals.h>
 #include <errors/errors.h>
+#include <resolver/resolver.h>
 #include <vector>
 #include <iostream>
 
@@ -16,5 +17,9 @@ int main(void){
     if(MyLangGlobals::getInstance().hadError == true)
         exit(2);
     Interpreter* ipreter = new Interpreter();
+    Resolver* res = new Resolver(ipreter);
+    res->resolve(stmts);
+    if(MyLangGlobals::getInstance().hadError == true)
+        exit(3);
     ipreter->interpret(stmts);
 }

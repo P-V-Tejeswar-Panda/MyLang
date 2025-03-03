@@ -14,6 +14,8 @@ public:
     Environment(Environment* enclosing);
     void define(std::string, MyLang_Object* obj);
     MyLang_Object* get(Token* tk);
+    MyLang_Object* getAt(int distance, std::string name);
+    Environment* ancestor(int distance);
     void assign(Token* tk, MyLang_Object* obj);
 
 };

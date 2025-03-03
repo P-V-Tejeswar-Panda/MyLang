@@ -16,6 +16,7 @@ class Interpreter: public ExprVisitor, public StmtVisitor{
 public:
     Environment* env;
     Environment* globals;
+    std::unordered_map<Expr*, int>* scope_map;
     virtual MyLang_Object* visit(Literal* literal);
     virtual MyLang_Object* visit(Grouping* grouping);
     virtual MyLang_Object* visit(Unary* unary);
@@ -41,6 +42,8 @@ public:
     virtual void checkNumberOperand(Token* op, MyLang_Object* operand);
     virtual void checkNumberOperands(Token* op, MyLang_Object* l_operand, MyLang_Object* r_operand);
     virtual std::string stringify(MyLang_Object* obj);
+    void resolve(Expr* expr,int depth);
+    MyLang_Object* lookUpVariable(Token* name, Expr* exp);
     Interpreter();
 };
 #endif

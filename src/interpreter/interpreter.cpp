@@ -100,7 +100,7 @@ MyLang_Object *Interpreter::visit(Binary *binary)
 
 MyLang_Object *Interpreter::visit(Variable *variable)
 {
-    return env->get(variable->name);
+    return lookUpVariable(variable->name, variable);
 }
 
 MyLang_Object *Interpreter::visit(Assign *assign)
@@ -331,9 +331,24 @@ std::string Interpreter::stringify(MyLang_Object *obj)
     return "Error";
 }
 
+void Interpreter::resolve(Expr *expr, int depth)
+{
+    (*(this->scope_map))[expr] = depth;
+}
+MyLang_Object* Interpreter::lookUpVariable(Token *name, Expr *exp)
+{
+    if(this->scope_map->find(exp) != this->scope_map->end()){
+        int dist = (*this->scope_map)[exp];
+        return this->env->getAt(dist, name->lexeme);
+    }
+    else{
+        return this->globals->get(name);
+    }
+}
 Interpreter::Interpreter()
 {
     this->globals = new Environment();
     this->env = globals;
+    this->scope_map = new std::unordered_map<Expr*, int>();
     this->globals->define("clock", new Clock());
 }
