@@ -6,6 +6,7 @@ Resolver::Resolver(Interpreter *ipreter)
 {
     this->ipreter = ipreter;
     this->scopes = new std::vector<std::unordered_map<std::string, bool>*>();
+    this->currentFuncType = FUNCTION_TYPE::NONE;
 }
 
 void Resolver::resolve(Expr *expr)
@@ -68,14 +69,17 @@ void Resolver::resolveLocal(Expr *expr, Token *name)
     }
 }
 
-void Resolver::resolveFunction(Function *funcDecl)
+void Resolver::resolveFunction(Function *funcDecl, FUNCTION_TYPE ftype)
 {
     beginScope();
+    FUNCTION_TYPE enclosingFunction = this->currentFuncType;
+    this->currentFuncType = ftype;
     for(Token* param: *(funcDecl->params)){
         declare(param);
         define(param);
     }
     resolve(funcDecl->body);
+    this->currentFuncType = enclosingFunction;
     endScope();
 }
 
@@ -190,7 +194,7 @@ void Resolver::visit(Function *funcDecl)
     declare(funcDecl->name);
     define(funcDecl->name);
 
-    resolveFunction(funcDecl);
+    resolveFunction(funcDecl, FUNCTION_TYPE::FUNCTION);
 }
 
 void Resolver::visit(While *whileStmt)
@@ -201,6 +205,9 @@ void Resolver::visit(While *whileStmt)
 
 void Resolver::visit(Return *returnStmt)
 {
+    if(this->currentFuncType == FUNCTION_TYPE::NONE)
+        myLang::communicateError(returnStmt->ret_token,
+                            "Cannot return from top-level code");
     if(returnStmt->exp)
         resolve(returnStmt->exp);
 }

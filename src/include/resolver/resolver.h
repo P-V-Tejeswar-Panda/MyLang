@@ -10,16 +10,21 @@
 #include <string>
 #include <vector>
 
+enum FUNCTION_TYPE{
+    NONE, FUNCTION
+};
+
 class Resolver: public ExprVisitor, public StmtVisitor{
     Interpreter* ipreter;
     std::vector<std::unordered_map<std::string, bool>*>* scopes;
+    enum FUNCTION_TYPE currentFuncType;
 public:
     Resolver(Interpreter* ipreter);
     void resolve(Expr* expr);
     void resolve(Stmt* stmt);
     void resolve(std::vector<Stmt*>* stmtList);
     void resolveLocal(Expr* expr, Token* name);
-    void resolveFunction(Function* funcDecl);
+    void resolveFunction(Function* funcDecl, FUNCTION_TYPE ftype);
     void beginScope();
     void endScope();
     void declare(Token* tk);
