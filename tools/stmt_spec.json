@@ -145,6 +145,24 @@
             ]
         },
         {
+            "name": "Class",
+            "base": "Stmt",
+            "init_args": [["Token*", "name"], ["std::vector<Function*>*", "methods"]],
+            "functions": [
+                {
+                    "name": "nodeType",
+                    "returntype": "enum AST_NODE_TYPES",
+                    "body": "return AST_NODE_TYPES::DEFN_CLASS;"
+                },
+                {
+                    "name": "accept",
+                    "returntype": "void",
+                    "args": [["StmtVisitor*", "visitor"]],
+                    "body": "return visitor->visit(this);"
+                }
+            ]
+        },
+        {
             "name": "Return",
             "base": "Stmt",
             "init_args": [["Token*", "ret_token"], ["Expr*", "exp"]],
@@ -192,6 +210,12 @@
                 {
                     "name": "visit",
                     "args": [["Function*", "funcDecl"]],
+                    "returntype": "void",
+                    "virtual": "pure"
+                },
+                {
+                    "name": "visit",
+                    "args": [["Class*", "classDecl"]],
                     "returntype": "void",
                     "virtual": "pure"
                 },

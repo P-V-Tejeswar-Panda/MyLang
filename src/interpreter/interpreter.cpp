@@ -135,6 +135,25 @@ MyLang_Object *Interpreter::visit(FuncCall *funcCall)
             +" arguments but got "+ std::to_string(args->size()));
     return func->call(this, args);
 }
+MyLang_Object *Interpreter::visit(Get *instGet)
+{
+    MyLang_Object* obj = evaluate(instGet->instObject);
+    if(obj->getType() == MYLANG_INSTANCE){
+        return ((UserDefinedClassInstance*)obj)->get(instGet->name);
+    }
+    throw new myLang::RuntimeError(instGet->name,
+                                    "Only instances have properties.");
+}
+MyLang_Object *Interpreter::visit(Set *instSet)
+{
+    MyLang_Object* obj = evaluate(instSet->instObject);
+    if(obj->getType() != MyLang_object_type::MYLANG_INSTANCE)
+        throw new myLang::RuntimeError(instSet->name,
+                    "Only instances have fields");
+    MyLang_Object* val = evaluate(instSet->value);
+    ((UserDefinedClassInstance*)obj)->set(instSet->name, val);
+    return val;
+}
 void Interpreter::visit(Print *printStmt)
 {
     MyLang_Object* val = evaluate(printStmt->expression);
@@ -175,6 +194,18 @@ void Interpreter::visit(Function *funcDecl)
     UserDefinedFunc *uFunc = new UserDefinedFunc(funcDecl, this->env);
     env->define(funcDecl->name->lexeme, uFunc);
 }
+void Interpreter::visit(Class *classDecl)
+{
+    this->env->define(classDecl->name->lexeme, NULL);
+    std::unordered_map<std::string, UserDefinedFunc*>* methods = 
+                        new std::unordered_map<std::string, UserDefinedFunc*>();
+    for(Function* fn: *classDecl->methods){
+        UserDefinedFunc* ufunc = new UserDefinedFunc(fn, this->env);
+        (*methods)[fn->name->lexeme] = ufunc;
+    }
+    UserDefinedClass* cls = new UserDefinedClass(classDecl->name->lexeme, methods);
+    this->env->assign(classDecl->name, cls);
+}
 void Interpreter::visit(Return *retStmt)
 {
     MyLang_Object* obj = NULL;
@@ -208,6 +239,8 @@ void Interpreter::execute(Stmt *stmt)
         ((While*)stmt)->accept(this);
     if(stmt->nodeType() == AST_NODE_TYPES::DEFN_FUNC)
         ((Function*)stmt)->accept(this);
+    if(stmt->nodeType() == AST_NODE_TYPES::DEFN_CLASS)
+        ((Class*)stmt)->accept(this);
     if(stmt->nodeType() == AST_NODE_TYPES::STMT_RET)
         ((Return*)stmt)->accept(this);
     
@@ -250,6 +283,8 @@ MyLang_Object *Interpreter::evaluate(Expr *expr)
             return ((Assign*)expr)->accept(this);
         case AST_NODE_TYPES::EXPR_FUNC_CALL:
             return ((FuncCall*)expr)->accept(this);
+        case AST_NODE_TYPES::EXPR_INST_GET:
+            return ((Get*)expr)->accept(this);
     }
     return NULL;
 }
@@ -328,7 +363,11 @@ std::string Interpreter::stringify(MyLang_Object *obj)
         }
         return "false";
     }
-    return "Error";
+    if(obj->getType() == MyLang_object_type::MYLANG_CALLABLE)
+        return "Callable";                                          //TODO: fix this
+    if(obj->getType() == MyLang_object_type::MYLANG_INSTANCE)
+        return ((UserDefinedClassInstance*)obj)->toString();
+        return "Error";
 }
 
 void Interpreter::resolve(Expr *expr, int depth)

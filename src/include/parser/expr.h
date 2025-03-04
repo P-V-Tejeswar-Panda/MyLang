@@ -94,6 +94,25 @@ public:
     enum AST_NODE_TYPES nodeType();
 };
 
+class Get: public Expr{
+public:
+    Expr* instObject;
+    Token* name;
+    Get(Expr* instObject,Token* name);
+    virtual MyLang_Object* accept(ExprVisitor* visitor);
+    enum AST_NODE_TYPES nodeType();
+};
+
+class Set: public Expr{
+public:
+    Expr* instObject;
+    Token* name;
+    Expr* value;
+    Set(Expr* instObject,Token* name,Expr* value);
+    virtual MyLang_Object* accept(ExprVisitor* visitor);
+    enum AST_NODE_TYPES nodeType();
+};
+
 class ExprVisitor{
 public:
     ExprVisitor();
@@ -103,6 +122,8 @@ public:
     virtual MyLang_Object* visit(Unary* unary) = 0;
     virtual MyLang_Object* visit(Variable* variable) = 0;
     virtual MyLang_Object* visit(FuncCall* funcCall) = 0;
+    virtual MyLang_Object* visit(Get* instGet) = 0;
+    virtual MyLang_Object* visit(Set* instSet) = 0;
     virtual MyLang_Object* visit(Assign* assign) = 0;
     virtual MyLang_Object* visit(Binary* binary) = 0;
 };

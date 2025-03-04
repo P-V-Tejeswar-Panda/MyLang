@@ -5,8 +5,10 @@ the following grammar.
 program        → declaration* EOF ;
 
 declaration    → varDecl
-               | statement
-               | funcDecl ;
+               | funcDecl
+               | classDecl
+               | statement ;
+classDecl      → "class" INDENTIFIER "{" function* "}" ;
 funcDecl       → "func" function;
 function       → IDENTIFIER "(" parameters ")" block ;
 parameters     → IDENTIFIER ("," IDENTIFIER)* ;
@@ -24,8 +26,8 @@ ifStmt         → "if" "(" expression ")" statement
                ( "else" statement )?;
 block          → "{" declaration* "}" ;
 expression     → assignment ;
-assignment     → IDENTIFIER "=" assignment
-               | equality ;
+assignment     → (call ".")? IDENTIFIER "=" assignment
+               | logical_or ;
 logical_or     → logical_and ("or" logical_and)*;
 logical_and    → equality ("and" equality)*;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
@@ -34,7 +36,7 @@ term           → factor ( ( "-" | "+" ) factor )* ;
 factor         → unary ( ( "/" | "*" ) unary )* ;
 unary          → ( "!" | "-" ) unary
                | call ;
-call           → primary ("(" arguments? ")")* ;
+call           → primary ("(" arguments? ")" | "." IDENTIFIER )* ;
 primary        → NUMBER | STRING | "true" | "false" | "nil"
                | "(" expression ")"
                | IDENTIFIER ;
@@ -142,6 +144,10 @@ Expr *Parser::getAssign()
         if(exp->nodeType() == AST_NODE_TYPES::VARIABLE){
             Token* name = ((Variable*)exp)->name;
             return new Assign(name, val);
+        }
+        else if(exp->nodeType() == AST_NODE_TYPES::EXPR_INST_GET){
+            Get* get = (Get*) exp;
+            return new Set(get->instObject, get->name, val);
         }
         error(eq, "Invalid assignment target.");
     }
@@ -308,23 +314,30 @@ Expr *Parser::getAnd()
 Expr *Parser::getFuncCall()
 {
     Expr* exp = getPrimary();
-    while(match(TokenType::LEFT_PAREN)){
-        std::vector<Expr*>* args = new std::vector<Expr*>();
-        if(peek()->ttype == TokenType::RIGHT_PAREN){
+    while(true){
+        if(match(TokenType::LEFT_PAREN)){
+            std::vector<Expr*>* args = new std::vector<Expr*>();
+            if(peek()->ttype == TokenType::RIGHT_PAREN){
+                exp = new FuncCall(exp, peek(), args);
+                advance();
+                continue;
+            }
+            do{
+                if(args->size() >= 255)
+                    error(peek(), "Not more than 255 arguments is allowed!");
+                args->push_back(getExpr());
+            }
+            while(match(TokenType::COMMA));
+            if(peek()->ttype != TokenType::RIGHT_PAREN)
+                throw error(peek(), "Expect ')' after arguments in function call.");
             exp = new FuncCall(exp, peek(), args);
             advance();
-            continue;
+        } else if (match(TokenType::DOT)) {
+            Token* name = consume(IDENTIFIER, "Expect property name after '.'.");
+            exp = new Get(exp, name);
         }
-        do{
-            if(args->size() >= 255)
-                error(peek(), "Not more than 255 arguments is allowed!");
-            args->push_back(getExpr());
-        }
-        while(match(TokenType::COMMA));
-        if(peek()->ttype != TokenType::RIGHT_PAREN)
-            throw error(peek(), "Expect ')' after arguments in function call.");
-        exp = new FuncCall(exp, peek(), args);
-        advance();
+        else
+            break;
     }
     return exp;
 }
@@ -460,6 +473,8 @@ Stmt *Parser::parseDeclaration()
         }
         if(match(TokenType::FUN))
             return parseFuncDeclaration("function");
+        if(match(TokenType::CLASS))
+            return parseClassDeclaration();
         return parseStatement();
     } catch (myLang::ParseError* pe){
         synchronize();
@@ -506,6 +521,18 @@ Stmt *Parser::parseFuncDeclaration(std::string kind)
         throw error(peek(), "Expect '{' before "+kind+" body.");
     std::vector<Stmt*>* body = parseBlock();
     return new Function(name, params, body);
+}
+Stmt *Parser::parseClassDeclaration()
+{
+    Token* clsName = consume(TokenType::IDENTIFIER, "Expect class name.");
+    consume(TokenType::LEFT_BRACE, "Expect '{' before class body.");
+
+    std::vector<Function*> *methods = new std::vector<Function*>();
+    while(peek()->ttype != TokenType::RIGHT_BRACE && peek()->ttype != TokenType::EOF_){
+        methods->push_back((Function*)parseFuncDeclaration("methods"));
+    }
+    consume(TokenType::RIGHT_BRACE, "Expect '}' after class body.");
+    return new Class(clsName, methods);
 }
 std::vector<Stmt *> *Parser::getAST()
 {

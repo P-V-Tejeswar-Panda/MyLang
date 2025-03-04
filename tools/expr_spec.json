@@ -175,6 +175,45 @@
             ]
         },
         {
+            "name": "Get",
+            "base": "Expr",
+            "init_args": [["Expr*", "instObject"], ["Token*", "name"]],
+            "functions": [
+                {
+                    "name": "accept",
+                    "args": [["ExprVisitor*", "visitor"]],
+                    "body": "return visitor->visit(this);",
+                    "virtual": "override",
+                    "returntype": "MyLang_Object*"
+                },
+                {
+                    "name": "nodeType",
+                    "returntype": "enum AST_NODE_TYPES",
+                    "body": "return AST_NODE_TYPES::EXPR_INST_GET;"
+                }
+            ]
+        },
+        {
+            "name": "Set",
+            "base": "Expr",
+            "init_args": [["Expr*", "instObject"],
+                            ["Token*", "name"], ["Expr*", "value"]],
+            "functions": [
+                {
+                    "name": "accept",
+                    "args": [["ExprVisitor*", "visitor"]],
+                    "body": "return visitor->visit(this);",
+                    "virtual": "override",
+                    "returntype": "MyLang_Object*"
+                },
+                {
+                    "name": "nodeType",
+                    "returntype": "enum AST_NODE_TYPES",
+                    "body": "return AST_NODE_TYPES::EXPR_INST_SET;"
+                }
+            ]
+        },
+        {
             "name": "ExprVisitor",
             "functions": [
                 {
@@ -210,6 +249,18 @@
                 {
                     "name": "visit",
                     "args": [["FuncCall*", "funcCall"]],
+                    "returntype": "MyLang_Object*",
+                    "virtual": "pure"
+                },
+                {
+                    "name": "visit",
+                    "args": [["Get*", "instGet"]],
+                    "returntype": "MyLang_Object*",
+                    "virtual": "pure"
+                },
+                {
+                    "name": "visit",
+                    "args": [["Set*", "instSet"]],
                     "returntype": "MyLang_Object*",
                     "virtual": "pure"
                 },

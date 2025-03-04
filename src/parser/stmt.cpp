@@ -91,6 +91,18 @@ void Function::accept(StmtVisitor* visitor){
 }
 
 
+Class::Class(Token* name,std::vector<Function*>* methods){
+    this->name = name;
+    this->methods = methods;
+}
+enum AST_NODE_TYPES Class::nodeType(){
+    return AST_NODE_TYPES::DEFN_CLASS;
+}
+void Class::accept(StmtVisitor* visitor){
+    return visitor->visit(this);
+}
+
+
 Return::Return(Token* ret_token,Expr* exp){
     this->ret_token = ret_token;
     this->exp = exp;

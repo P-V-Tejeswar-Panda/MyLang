@@ -29,3 +29,63 @@ MyLang_object_type UserDefinedFunc::getType()
 {
     return MyLang_object_type::MYLANG_CALLABLE;
 }
+
+UserDefinedClass::UserDefinedClass(std::string clsName,
+    std::unordered_map<std::string, UserDefinedFunc*>* methods)
+{
+    this->clsName = clsName;
+    this->methods = methods;
+}
+
+int UserDefinedClass::arity()
+{
+    return 0;
+}
+
+MyLang_Object *UserDefinedClass::call(Interpreter *ipreter, std::vector<MyLang_Object *> *args)
+{
+    return new UserDefinedClassInstance(this);
+}
+
+MyLang_object_type UserDefinedClass::getType()
+{
+    return MyLang_object_type::MYLANG_CALLABLE;
+}
+
+std::string UserDefinedClass::toString()
+{
+    return this->clsName;
+}
+
+UserDefinedFunc *UserDefinedClass::getMethod(std::string name)
+{
+    if(methods->find(name) != methods->end())
+        return (*methods)[name];
+    return nullptr;
+}
+
+UserDefinedClassInstance::UserDefinedClassInstance(UserDefinedClass *cls)
+{
+    this->cls = cls;
+    this->setType(MyLang_object_type::MYLANG_INSTANCE);
+}
+
+std::string UserDefinedClassInstance::toString()
+{
+    return this->cls->toString()+" instance.";
+}
+
+MyLang_Object *UserDefinedClassInstance::get(Token *name)
+{
+    if(this->fields->find(name->lexeme) != this->fields->end())
+        return (*this->fields)[name->lexeme];
+    UserDefinedFunc* uf = this->cls->getMethod(name->lexeme);
+    if(uf)
+        return uf;
+    throw myLang::RuntimeError(name, "Undefined property '" + name->lexeme + "'.");
+}
+
+void UserDefinedClassInstance::set(Token *name, MyLang_Object *value)
+{
+    (*this->fields)[name->lexeme] = value;
+}

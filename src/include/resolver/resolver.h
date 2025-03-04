@@ -11,7 +11,7 @@
 #include <vector>
 
 enum FUNCTION_TYPE{
-    NONE, FUNCTION
+    NONE, FUNCTION, METHOD
 };
 
 class Resolver: public ExprVisitor, public StmtVisitor{
@@ -37,12 +37,15 @@ public:
     virtual MyLang_Object* visit(FuncCall* funcCall) ;
     virtual MyLang_Object* visit(Assign* assign) ;
     virtual MyLang_Object* visit(Binary* binary) ;
+    virtual MyLang_Object* visit(Get* instGet) ;
+    virtual MyLang_Object* visit(Set* instSet);
 
     virtual void visit(Print* printStmt) ;
     virtual void visit(Expression* exprStmt) ;
     virtual void visit(Block* blockStmt) ;
     virtual void visit(If* ifStmt) ;
     virtual void visit(Function* funcDecl) ;
+    virtual void visit(Class* classDecl) ;
     virtual void visit(While* whileStmt) ;
     virtual void visit(Return* returnStmt) ;
     virtual void visit(Var* varStmt) ;

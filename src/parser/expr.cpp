@@ -106,6 +106,31 @@ enum AST_NODE_TYPES FuncCall::nodeType(){
 }
 
 
+Get::Get(Expr* instObject,Token* name){
+    this->instObject = instObject;
+    this->name = name;
+}
+MyLang_Object* Get::accept(ExprVisitor* visitor){
+    return visitor->visit(this);
+}
+enum AST_NODE_TYPES Get::nodeType(){
+    return AST_NODE_TYPES::EXPR_INST_GET;
+}
+
+
+Set::Set(Expr* instObject,Token* name,Expr* value){
+    this->instObject = instObject;
+    this->name = name;
+    this->value = value;
+}
+MyLang_Object* Set::accept(ExprVisitor* visitor){
+    return visitor->visit(this);
+}
+enum AST_NODE_TYPES Set::nodeType(){
+    return AST_NODE_TYPES::EXPR_INST_SET;
+}
+
+
 ExprVisitor::ExprVisitor(){}
 
 

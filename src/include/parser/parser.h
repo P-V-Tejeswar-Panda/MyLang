@@ -43,6 +43,7 @@ public:
     Stmt* parseDeclaration();
     Stmt* parseVarDeclaration();
     Stmt* parseFuncDeclaration(std::string kind);
+    Stmt* parseClassDeclaration();
 
     std::vector<Stmt*>* getAST();
 };
