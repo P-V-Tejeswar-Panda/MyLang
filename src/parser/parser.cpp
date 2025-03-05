@@ -263,6 +263,9 @@ Expr *Parser::getPrimary()
                    t->ttype == TokenType::FALSE  ||
                    t->ttype == TokenType::NIL))
     {
+        if(t->ttype == TokenType::STRING){
+            t->lexeme = t->lexeme.substr(1, t->lexeme.size()-2);
+        }
         exp = new Literal(t);
         advance();
     }

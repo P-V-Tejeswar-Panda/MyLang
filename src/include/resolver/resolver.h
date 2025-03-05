@@ -11,13 +11,18 @@
 #include <vector>
 
 enum FUNCTION_TYPE{
-    NONE, FUNCTION, METHOD
+    F_NONE, FUNCTION, INITIALIZER, METHOD
+};
+
+enum CLASS_TYPE{
+    C_NONE, BASE_CLASS
 };
 
 class Resolver: public ExprVisitor, public StmtVisitor{
     Interpreter* ipreter;
     std::vector<std::unordered_map<std::string, bool>*>* scopes;
     enum FUNCTION_TYPE currentFuncType;
+    enum CLASS_TYPE currentClassType;
 public:
     Resolver(Interpreter* ipreter);
     void resolve(Expr* expr);

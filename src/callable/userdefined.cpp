@@ -1,16 +1,17 @@
 #include <callable/userdefined.h>
 
 
-UserDefinedFunc::UserDefinedFunc(Function *func, Environment* closure)
+UserDefinedFunc::UserDefinedFunc(Function *func, Environment* closure, bool isInit)
 {
     funcDefn = func;
     this->closure = closure;
+    this->isInitializer = isInit;
 }
 UserDefinedFunc *UserDefinedFunc::bind(UserDefinedClassInstance *inst)
 {
     Environment* env = new Environment(this->closure);
     env->define("this", inst);
-    return new UserDefinedFunc(this->funcDefn, env);
+    return new UserDefinedFunc(this->funcDefn, env, isInitializer);
 }
 int UserDefinedFunc::arity()
 {
@@ -26,8 +27,10 @@ MyLang_Object *UserDefinedFunc::call(Interpreter *ipreter, std::vector<MyLang_Ob
     try{
         ipreter->executeBlock(funcDefn->body, funcEnv);
     }catch(myLang::ReturnExp* exp){
+        if(isInitializer) return closure->getAt(0, "this");
         return exp->val;
     }
+    if(isInitializer) return closure->getAt(0, "this");
     return NULL;
 }
 
@@ -45,12 +48,18 @@ UserDefinedClass::UserDefinedClass(std::string clsName,
 
 int UserDefinedClass::arity()
 {
-    return 0;
+    UserDefinedFunc* initFunc = getMethod("init");
+    if(!initFunc) return 0;
+    return initFunc->arity();
 }
 
 MyLang_Object *UserDefinedClass::call(Interpreter *ipreter, std::vector<MyLang_Object *> *args)
 {
-    return new UserDefinedClassInstance(this);
+    UserDefinedClassInstance* instance = new UserDefinedClassInstance(this);
+    UserDefinedFunc* initFunc = getMethod("init");
+    if(initFunc)
+        initFunc->bind(instance)->call(ipreter, args);
+    return instance;
 }
 
 MyLang_object_type UserDefinedClass::getType()

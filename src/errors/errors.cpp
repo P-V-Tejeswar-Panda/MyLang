@@ -26,7 +26,7 @@ void communicateError(Token *tk, std::string msg){
 void communicateRuntimeError(RuntimeError *err)
 {
     std::ostringstream err_msg;
-    err_msg << err->msg << "\n[line " << err->tk->lineno << "]";
+    err_msg << err->msg << "\n[line " << err->tk->lineno << "]: " << err->msg;
     report(err_msg.str());
     MyLangGlobals::getInstance().hadRuntimeError = true;
 }

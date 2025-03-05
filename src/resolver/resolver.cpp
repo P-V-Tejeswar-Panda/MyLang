@@ -6,7 +6,8 @@ Resolver::Resolver(Interpreter *ipreter)
 {
     this->ipreter = ipreter;
     this->scopes = new std::vector<std::unordered_map<std::string, bool>*>();
-    this->currentFuncType = FUNCTION_TYPE::NONE;
+    this->currentFuncType = FUNCTION_TYPE::F_NONE;
+    this->currentClassType = CLASS_TYPE::C_NONE;
 }
 
 void Resolver::resolve(Expr *expr)
@@ -30,6 +31,8 @@ void Resolver::resolve(Expr *expr)
             ((FuncCall*)expr)->accept(this); break;
         case AST_NODE_TYPES::EXPR_INST_GET:
             ((Get*)expr)->accept(this); break;
+        case AST_NODE_TYPES::EXPR_INST_SET:
+            ((Set*)expr)->accept(this); break;
         case AST_NODE_TYPES::EXPR_THIS:
             ((This*)expr)->accept(this); break;
     }
@@ -184,6 +187,10 @@ MyLang_Object *Resolver::visit(Set *instSet)
 }
 MyLang_Object *Resolver::visit(This *keyword)
 {
+    if(currentClassType == CLASS_TYPE::C_NONE){
+        myLang::communicateError(keyword->keyword, "Can't use 'this' outside of a class.");
+        return NULL;
+    }
     resolveLocal(keyword, keyword->keyword);
     return nullptr;
 }
@@ -221,6 +228,8 @@ void Resolver::visit(Function *funcDecl)
 
 void Resolver::visit(Class *classDecl)
 {
+    CLASS_TYPE bkpClassType = this->currentClassType;
+    this->currentClassType = CLASS_TYPE::BASE_CLASS;
     declare(classDecl->name);
     define(classDecl->name);
 
@@ -229,10 +238,13 @@ void Resolver::visit(Class *classDecl)
 
     for(Function* meth: *classDecl->methods){
         FUNCTION_TYPE ftype = FUNCTION_TYPE::METHOD;
+        if(meth->name->lexeme == "init")
+            ftype = FUNCTION_TYPE::INITIALIZER;
         resolveFunction(meth, ftype);
     }
 
     endScope();
+    this->currentClassType = bkpClassType;
 }
 void Resolver::visit(While *whileStmt)
 {
@@ -242,11 +254,15 @@ void Resolver::visit(While *whileStmt)
 
 void Resolver::visit(Return *returnStmt)
 {
-    if(this->currentFuncType == FUNCTION_TYPE::NONE)
+    if(this->currentFuncType == FUNCTION_TYPE::F_NONE)
         myLang::communicateError(returnStmt->ret_token,
                             "Cannot return from top-level code");
-    if(returnStmt->exp)
+    if(returnStmt->exp){
+        if(this->currentFuncType == FUNCTION_TYPE::INITIALIZER)
+            myLang::communicateError(returnStmt->ret_token,
+                                            "can't return value from initializer.");
         resolve(returnStmt->exp);
+    }
 }
 
 void Resolver::visit(Var *varStmt)

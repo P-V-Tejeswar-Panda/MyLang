@@ -45,7 +45,7 @@
 "var"    {return VAR;}
 "while"  {return WHILE;}
 
-\".*\"                   {return STRING;}
+\"([^"\n\\]|\\(.|\n))*\" {return STRING;}
 \/\/.*                   {/*ignore comments*/}
 <<EOF>>                  {return EOF_;}
 [0-9]+(\.[0-9]+)*        {return NUMBER;}

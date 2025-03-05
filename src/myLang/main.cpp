@@ -21,5 +21,11 @@ int main(void){
     res->resolve(stmts);
     if(MyLangGlobals::getInstance().hadError == true)
         exit(3);
-    ipreter->interpret(stmts);
+    try{
+        ipreter->interpret(stmts);
+    }
+    catch(myLang::RuntimeError* re){
+        myLang::communicateRuntimeError(re);
+        exit(4);
+    }
 }

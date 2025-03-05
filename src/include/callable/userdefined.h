@@ -14,8 +14,9 @@ class UserDefinedClassInstance;
 class UserDefinedFunc: public MyLangCallable{
     Function* funcDefn;
     Environment* closure;
+    bool isInitializer;
 public:
-    UserDefinedFunc(Function* func, Environment* closure);
+    UserDefinedFunc(Function* func, Environment* closure, bool isInit);
     UserDefinedFunc* bind(UserDefinedClassInstance* inst);
     virtual int arity() override;
     virtual MyLang_Object* call(Interpreter* ipreter, std::vector<MyLang_Object*>* args) override;

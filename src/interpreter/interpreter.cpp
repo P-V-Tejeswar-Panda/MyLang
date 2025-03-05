@@ -195,7 +195,7 @@ void Interpreter::visit(While *whileStmt)
 }
 void Interpreter::visit(Function *funcDecl)
 {
-    UserDefinedFunc *uFunc = new UserDefinedFunc(funcDecl, this->env);
+    UserDefinedFunc *uFunc = new UserDefinedFunc(funcDecl, this->env, false);
     env->define(funcDecl->name->lexeme, uFunc);
 }
 void Interpreter::visit(Class *classDecl)
@@ -204,7 +204,7 @@ void Interpreter::visit(Class *classDecl)
     std::unordered_map<std::string, UserDefinedFunc*>* methods = 
                         new std::unordered_map<std::string, UserDefinedFunc*>();
     for(Function* fn: *classDecl->methods){
-        UserDefinedFunc* ufunc = new UserDefinedFunc(fn, this->env);
+        UserDefinedFunc* ufunc = new UserDefinedFunc(fn, this->env, (fn->name->lexeme == "init")?true:false);
         (*methods)[fn->name->lexeme] = ufunc;
     }
     UserDefinedClass* cls = new UserDefinedClass(classDecl->name->lexeme, methods);
@@ -289,6 +289,8 @@ MyLang_Object *Interpreter::evaluate(Expr *expr)
             return ((FuncCall*)expr)->accept(this);
         case AST_NODE_TYPES::EXPR_INST_GET:
             return ((Get*)expr)->accept(this);
+        case AST_NODE_TYPES::EXPR_INST_SET:
+            return ((Set*)expr)->accept(this);
         case AST_NODE_TYPES::EXPR_THIS:
             return ((This*)expr)->accept(this);
     }
