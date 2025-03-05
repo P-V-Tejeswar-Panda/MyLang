@@ -30,6 +30,8 @@ void Resolver::resolve(Expr *expr)
             ((FuncCall*)expr)->accept(this); break;
         case AST_NODE_TYPES::EXPR_INST_GET:
             ((Get*)expr)->accept(this); break;
+        case AST_NODE_TYPES::EXPR_THIS:
+            ((This*)expr)->accept(this); break;
     }
 }
 
@@ -180,6 +182,11 @@ MyLang_Object *Resolver::visit(Set *instSet)
     resolve(instSet->instObject);
     return NULL;
 }
+MyLang_Object *Resolver::visit(This *keyword)
+{
+    resolveLocal(keyword, keyword->keyword);
+    return nullptr;
+}
 void Resolver::visit(Print *printStmt)
 {
     resolve(printStmt->expression);
@@ -217,10 +224,15 @@ void Resolver::visit(Class *classDecl)
     declare(classDecl->name);
     define(classDecl->name);
 
+    beginScope();
+    scopes->back()->insert(std::make_pair("this", true));
+
     for(Function* meth: *classDecl->methods){
         FUNCTION_TYPE ftype = FUNCTION_TYPE::METHOD;
         resolveFunction(meth, ftype);
     }
+
+    endScope();
 }
 void Resolver::visit(While *whileStmt)
 {

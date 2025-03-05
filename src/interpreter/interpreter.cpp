@@ -154,6 +154,10 @@ MyLang_Object *Interpreter::visit(Set *instSet)
     ((UserDefinedClassInstance*)obj)->set(instSet->name, val);
     return val;
 }
+MyLang_Object *Interpreter::visit(This *keyword)
+{
+    return lookUpVariable(keyword->keyword, keyword);
+}
 void Interpreter::visit(Print *printStmt)
 {
     MyLang_Object* val = evaluate(printStmt->expression);
@@ -285,6 +289,8 @@ MyLang_Object *Interpreter::evaluate(Expr *expr)
             return ((FuncCall*)expr)->accept(this);
         case AST_NODE_TYPES::EXPR_INST_GET:
             return ((Get*)expr)->accept(this);
+        case AST_NODE_TYPES::EXPR_THIS:
+            return ((This*)expr)->accept(this);
     }
     return NULL;
 }

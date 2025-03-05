@@ -6,6 +6,12 @@ UserDefinedFunc::UserDefinedFunc(Function *func, Environment* closure)
     funcDefn = func;
     this->closure = closure;
 }
+UserDefinedFunc *UserDefinedFunc::bind(UserDefinedClassInstance *inst)
+{
+    Environment* env = new Environment(this->closure);
+    env->define("this", inst);
+    return new UserDefinedFunc(this->funcDefn, env);
+}
 int UserDefinedFunc::arity()
 {
     return funcDefn->params->size();
@@ -81,7 +87,7 @@ MyLang_Object *UserDefinedClassInstance::get(Token *name)
         return (*this->fields)[name->lexeme];
     UserDefinedFunc* uf = this->cls->getMethod(name->lexeme);
     if(uf)
-        return uf;
+        return uf->bind(this);
     throw myLang::RuntimeError(name, "Undefined property '" + name->lexeme + "'.");
 }
 

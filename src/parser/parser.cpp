@@ -270,6 +270,10 @@ Expr *Parser::getPrimary()
         exp = new Variable(t);
         advance();
     }
+    else if(t && t->ttype == TokenType::THIS){
+        exp = new This(t);
+        advance();
+    }
     else
         throw error(t, "Expect expression.");
     return exp;

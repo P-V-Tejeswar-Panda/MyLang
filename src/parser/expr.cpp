@@ -68,6 +68,17 @@ enum AST_NODE_TYPES Variable::nodeType(){
 }
 
 
+This::This(Token* keyword){
+    this->keyword = keyword;
+}
+MyLang_Object* This::accept(ExprVisitor* visitor){
+    return visitor->visit(this);
+}
+enum AST_NODE_TYPES This::nodeType(){
+    return AST_NODE_TYPES::EXPR_THIS;
+}
+
+
 Assign::Assign(Token* name,Expr* value){
     this->name = name;
     this->value = value;

@@ -65,6 +65,14 @@ public:
     enum AST_NODE_TYPES nodeType();
 };
 
+class This: public Expr{
+public:
+    Token* keyword;
+    This(Token* keyword);
+    virtual MyLang_Object* accept(ExprVisitor* visitor);
+    enum AST_NODE_TYPES nodeType();
+};
+
 class Assign: public Expr{
 public:
     Token* name;
@@ -121,6 +129,7 @@ public:
     virtual MyLang_Object* visit(Grouping* grouping) = 0;
     virtual MyLang_Object* visit(Unary* unary) = 0;
     virtual MyLang_Object* visit(Variable* variable) = 0;
+    virtual MyLang_Object* visit(This* keyword) = 0;
     virtual MyLang_Object* visit(FuncCall* funcCall) = 0;
     virtual MyLang_Object* visit(Get* instGet) = 0;
     virtual MyLang_Object* visit(Set* instSet) = 0;
