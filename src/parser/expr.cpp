@@ -142,6 +142,18 @@ enum AST_NODE_TYPES Set::nodeType(){
 }
 
 
+Super::Super(Token* keyword,Token* method){
+    this->keyword = keyword;
+    this->method = method;
+}
+MyLang_Object* Super::accept(ExprVisitor* visitor){
+    return visitor->visit(this);
+}
+enum AST_NODE_TYPES Super::nodeType(){
+    return AST_NODE_TYPES::EXPR_SUPER;
+}
+
+
 ExprVisitor::ExprVisitor(){}
 
 

@@ -233,6 +233,19 @@ void Resolver::visit(Class *classDecl)
     declare(classDecl->name);
     define(classDecl->name);
 
+    if(classDecl->superclass &&
+        classDecl->name->lexeme == classDecl->superclass->name->lexeme)
+    {
+        myLang::communicateError(classDecl->superclass->name,
+                "A class cannot inherit from itself.");
+    }
+
+    if(classDecl->superclass)
+        resolve(classDecl->superclass);
+    if(classDecl->superclass){
+        beginScope();
+        (*(scopes->back()))["super"] = true;
+    }
     beginScope();
     scopes->back()->insert(std::make_pair("this", true));
 
@@ -244,6 +257,8 @@ void Resolver::visit(Class *classDecl)
     }
 
     endScope();
+    if(classDecl->superclass)
+        endScope();
     this->currentClassType = bkpClassType;
 }
 void Resolver::visit(While *whileStmt)

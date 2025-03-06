@@ -83,8 +83,9 @@ public:
 class Class: public Stmt{
 public:
     Token* name;
+    Variable* superclass;
     std::vector<Function*>* methods;
-    Class(Token* name,std::vector<Function*>* methods);
+    Class(Token* name,Variable* superclass,std::vector<Function*>* methods);
     enum AST_NODE_TYPES nodeType();
     void accept(StmtVisitor* visitor);
 };

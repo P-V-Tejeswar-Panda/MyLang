@@ -91,8 +91,9 @@ void Function::accept(StmtVisitor* visitor){
 }
 
 
-Class::Class(Token* name,std::vector<Function*>* methods){
+Class::Class(Token* name,Variable* superclass,std::vector<Function*>* methods){
     this->name = name;
+    this->superclass = superclass;
     this->methods = methods;
 }
 enum AST_NODE_TYPES Class::nodeType(){

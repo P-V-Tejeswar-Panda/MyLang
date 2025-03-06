@@ -121,6 +121,15 @@ public:
     enum AST_NODE_TYPES nodeType();
 };
 
+class Super: public Expr{
+public:
+    Token* keyword;
+    Token* method;
+    Super(Token* keyword,Token* method);
+    virtual MyLang_Object* accept(ExprVisitor* visitor);
+    enum AST_NODE_TYPES nodeType();
+};
+
 class ExprVisitor{
 public:
     ExprVisitor();
@@ -133,6 +142,7 @@ public:
     virtual MyLang_Object* visit(FuncCall* funcCall) = 0;
     virtual MyLang_Object* visit(Get* instGet) = 0;
     virtual MyLang_Object* visit(Set* instSet) = 0;
+    virtual MyLang_Object* visit(Super* superkey) = 0;
     virtual MyLang_Object* visit(Assign* assign) = 0;
     virtual MyLang_Object* visit(Binary* binary) = 0;
 };

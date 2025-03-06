@@ -12,5 +12,5 @@ MyLang_Object *Clock::call(Interpreter *ipreter, std::vector<MyLang_Object *> *a
 
 MyLang_object_type Clock::getType()
 {
-    return MyLang_object_type::MYLANG_CALLABLE;
+    return MyLang_object_type::MYLANG_FUNCTION;
 }

@@ -21,13 +21,15 @@ public:
     virtual int arity() override;
     virtual MyLang_Object* call(Interpreter* ipreter, std::vector<MyLang_Object*>* args) override;
     virtual MyLang_object_type getType() override;
+    virtual std::string toString();
 };
 
 class UserDefinedClass: public MyLangCallable{
     std::string clsName;
+    UserDefinedClass* superclass;
     std::unordered_map<std::string, UserDefinedFunc*>* methods;
 public:
-    UserDefinedClass(std::string clsName, std::unordered_map<std::string, UserDefinedFunc*>* methods);
+    UserDefinedClass(std::string clsName, UserDefinedClass* superclass, std::unordered_map<std::string, UserDefinedFunc*>* methods);
     virtual int arity() override;
     virtual MyLang_Object* call(Interpreter* ipreter, std::vector<MyLang_Object*>* args) override;
     virtual MyLang_object_type getType() override;

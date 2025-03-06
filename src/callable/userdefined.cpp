@@ -36,14 +36,19 @@ MyLang_Object *UserDefinedFunc::call(Interpreter *ipreter, std::vector<MyLang_Ob
 
 MyLang_object_type UserDefinedFunc::getType()
 {
-    return MyLang_object_type::MYLANG_CALLABLE;
+    return MyLang_object_type::MYLANG_FUNCTION;
 }
 
-UserDefinedClass::UserDefinedClass(std::string clsName,
-    std::unordered_map<std::string, UserDefinedFunc*>* methods)
+std::string UserDefinedFunc::toString()
+{
+    return "Function: "+funcDefn->name->lexeme;
+}
+UserDefinedClass::UserDefinedClass(std::string clsName,  UserDefinedClass* superclass,
+                                   std::unordered_map<std::string, UserDefinedFunc *> *methods)
 {
     this->clsName = clsName;
     this->methods = methods;
+    this->superclass = superclass;
 }
 
 int UserDefinedClass::arity()
@@ -64,7 +69,7 @@ MyLang_Object *UserDefinedClass::call(Interpreter *ipreter, std::vector<MyLang_O
 
 MyLang_object_type UserDefinedClass::getType()
 {
-    return MyLang_object_type::MYLANG_CALLABLE;
+    return MyLang_object_type::MYLANG_CLASS;
 }
 
 std::string UserDefinedClass::toString()
@@ -76,6 +81,8 @@ UserDefinedFunc *UserDefinedClass::getMethod(std::string name)
 {
     if(methods->find(name) != methods->end())
         return (*methods)[name];
+    if(superclass)
+        return superclass->getMethod(name);
     return nullptr;
 }
 

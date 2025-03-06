@@ -1,5 +1,5 @@
 /*
-This expression parser implements A recursive descent parser for
+This parser implements A recursive descent parser for
 the following grammar.
 --------------------------------------------------------------
 program        → declaration* EOF ;
@@ -8,7 +8,7 @@ declaration    → varDecl
                | funcDecl
                | classDecl
                | statement ;
-classDecl      → "class" INDENTIFIER "{" function* "}" ;
+classDecl      → "class" IDENTIFIER ( "<" IDENTIFIER )? "{" function* "}" ;
 funcDecl       → "func" function;
 function       → IDENTIFIER "(" parameters ")" block ;
 parameters     → IDENTIFIER ("," IDENTIFIER)* ;
@@ -38,7 +38,7 @@ unary          → ( "!" | "-" ) unary
                | call ;
 call           → primary ("(" arguments? ")" | "." IDENTIFIER )* ;
 primary        → NUMBER | STRING | "true" | "false" | "nil"
-               | "(" expression ")"
+               | "(" expression ")" | "super" "." IDENTIFIER
                | IDENTIFIER ;
 arguments      → expression ("," expression)* ;
 --------------------------------------------------------------
@@ -276,6 +276,14 @@ Expr *Parser::getPrimary()
     else if(t && t->ttype == TokenType::THIS){
         exp = new This(t);
         advance();
+    }
+    else if(t && t->ttype == TokenType::SUPER){
+        Token* keyword = t;
+        advance();
+        consume(TokenType::DOT, "Expect '.' after 'super'.");
+        Token* method = consume(TokenType::IDENTIFIER,
+                                            "Expect superclass method name.");
+        exp = new Super(keyword, method);
     }
     else
         throw error(t, "Expect expression.");
@@ -532,14 +540,19 @@ Stmt *Parser::parseFuncDeclaration(std::string kind)
 Stmt *Parser::parseClassDeclaration()
 {
     Token* clsName = consume(TokenType::IDENTIFIER, "Expect class name.");
+    Variable* superclass = NULL;
+    if(match(TokenType::LESS))
+        if(peek()->ttype == TokenType::IDENTIFIER)
+            superclass = new Variable(match(TokenType::IDENTIFIER));
+        else
+            throw error(peek(), "Expect superclass name");
     consume(TokenType::LEFT_BRACE, "Expect '{' before class body.");
-
     std::vector<Function*> *methods = new std::vector<Function*>();
     while(peek()->ttype != TokenType::RIGHT_BRACE && peek()->ttype != TokenType::EOF_){
         methods->push_back((Function*)parseFuncDeclaration("methods"));
     }
     consume(TokenType::RIGHT_BRACE, "Expect '}' after class body.");
-    return new Class(clsName, methods);
+    return new Class(clsName, superclass, methods);
 }
 std::vector<Stmt *> *Parser::getAST()
 {

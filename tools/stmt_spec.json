@@ -147,7 +147,7 @@
         {
             "name": "Class",
             "base": "Stmt",
-            "init_args": [["Token*", "name"], ["std::vector<Function*>*", "methods"]],
+            "init_args": [["Token*", "name"], ["Variable*", "superclass"], ["std::vector<Function*>*", "methods"]],
             "functions": [
                 {
                     "name": "nodeType",

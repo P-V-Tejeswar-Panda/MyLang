@@ -125,7 +125,8 @@ MyLang_Object *Interpreter::visit(FuncCall *funcCall)
     std::vector<MyLang_Object*>* args = new std::vector<MyLang_Object*>();
     for(Expr* exp : *(funcCall->args))
         args->push_back(evaluate(exp));
-    if(callee->getType() != MyLang_object_type::MYLANG_CALLABLE)
+    if(callee->getType() != MyLang_object_type::MYLANG_CLASS &&
+       callee->getType() != MyLang_object_type::MYLANG_FUNCTION)
         throw new myLang::RuntimeError(funcCall->paren,
                                         "Can only call functions and classes.");
     MyLangCallable* func = (MyLangCallable*) callee;
@@ -200,6 +201,14 @@ void Interpreter::visit(Function *funcDecl)
 }
 void Interpreter::visit(Class *classDecl)
 {
+    MyLang_Object* supClass = NULL;
+    if(classDecl->superclass != NULL){
+        supClass = evaluate(classDecl->superclass);
+        if(supClass->getType() != MyLang_object_type::MYLANG_CLASS){
+            throw new myLang::RuntimeError(classDecl->superclass->name,
+                            "Superclass must be a class.");
+        }
+    }
     this->env->define(classDecl->name->lexeme, NULL);
     std::unordered_map<std::string, UserDefinedFunc*>* methods = 
                         new std::unordered_map<std::string, UserDefinedFunc*>();
@@ -207,7 +216,8 @@ void Interpreter::visit(Class *classDecl)
         UserDefinedFunc* ufunc = new UserDefinedFunc(fn, this->env, (fn->name->lexeme == "init")?true:false);
         (*methods)[fn->name->lexeme] = ufunc;
     }
-    UserDefinedClass* cls = new UserDefinedClass(classDecl->name->lexeme, methods);
+    UserDefinedClass* cls = new UserDefinedClass(classDecl->name->lexeme,
+                                                        (UserDefinedClass*)supClass, methods);
     this->env->assign(classDecl->name, cls);
 }
 void Interpreter::visit(Return *retStmt)
@@ -371,11 +381,13 @@ std::string Interpreter::stringify(MyLang_Object *obj)
         }
         return "false";
     }
-    if(obj->getType() == MyLang_object_type::MYLANG_CALLABLE)
-        return "Callable";                                          //TODO: fix this
+    if(obj->getType() == MyLang_object_type::MYLANG_FUNCTION)
+        return ((UserDefinedFunc*)obj)->toString();
+    if(obj->getType() == MyLang_object_type::MYLANG_CLASS)
+        return ((UserDefinedClass*)obj)->toString();
     if(obj->getType() == MyLang_object_type::MYLANG_INSTANCE)
         return ((UserDefinedClassInstance*)obj)->toString();
-        return "Error";
+    return "Error";
 }
 
 void Interpreter::resolve(Expr *expr, int depth)
