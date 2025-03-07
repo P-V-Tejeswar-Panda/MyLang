@@ -15,7 +15,7 @@ enum FUNCTION_TYPE{
 };
 
 enum CLASS_TYPE{
-    C_NONE, BASE_CLASS
+    C_NONE, BASE_CLASS, SUB_CLASS
 };
 
 class Resolver: public ExprVisitor, public StmtVisitor{
@@ -45,6 +45,7 @@ public:
     virtual MyLang_Object* visit(Get* instGet) ;
     virtual MyLang_Object* visit(Set* instSet);
     virtual MyLang_Object* visit(This* keyword);
+    virtual MyLang_Object* visit(Super* superkey);
 
     virtual void visit(Print* printStmt) ;
     virtual void visit(Expression* exprStmt) ;

@@ -159,6 +159,18 @@ MyLang_Object *Interpreter::visit(This *keyword)
 {
     return lookUpVariable(keyword->keyword, keyword);
 }
+MyLang_Object *Interpreter::visit(Super *superkey)
+{
+    int dist = (*(this->scope_map))[superkey];
+    UserDefinedClass* supClass = (UserDefinedClass*)this->env->getAt(dist, "super");
+    UserDefinedClassInstance* instance = (UserDefinedClassInstance*) this->env->getAt(dist-1, "this");
+    UserDefinedFunc* method = (UserDefinedFunc*)supClass->getMethod(superkey->method->lexeme);
+    if(!method){
+        throw new myLang::RuntimeError(superkey->method, 
+                        "Undefined property '"+superkey->method->lexeme+"'.");
+    }
+    return method->bind(instance);
+}
 void Interpreter::visit(Print *printStmt)
 {
     MyLang_Object* val = evaluate(printStmt->expression);
@@ -210,6 +222,10 @@ void Interpreter::visit(Class *classDecl)
         }
     }
     this->env->define(classDecl->name->lexeme, NULL);
+    if(classDecl->superclass){
+        this->env = new Environment(this->env);
+        this->env->define("super", supClass);
+    }
     std::unordered_map<std::string, UserDefinedFunc*>* methods = 
                         new std::unordered_map<std::string, UserDefinedFunc*>();
     for(Function* fn: *classDecl->methods){
@@ -218,6 +234,9 @@ void Interpreter::visit(Class *classDecl)
     }
     UserDefinedClass* cls = new UserDefinedClass(classDecl->name->lexeme,
                                                         (UserDefinedClass*)supClass, methods);
+    if(supClass){
+        this->env = this->env->enclosingEnv;
+    }
     this->env->assign(classDecl->name, cls);
 }
 void Interpreter::visit(Return *retStmt)
@@ -303,6 +322,8 @@ MyLang_Object *Interpreter::evaluate(Expr *expr)
             return ((Set*)expr)->accept(this);
         case AST_NODE_TYPES::EXPR_THIS:
             return ((This*)expr)->accept(this);
+        case AST_NODE_TYPES::EXPR_SUPER:
+            return ((Super*)expr)->accept(this);
     }
     return NULL;
 }

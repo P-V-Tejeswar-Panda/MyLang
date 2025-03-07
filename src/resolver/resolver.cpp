@@ -35,6 +35,8 @@ void Resolver::resolve(Expr *expr)
             ((Set*)expr)->accept(this); break;
         case AST_NODE_TYPES::EXPR_THIS:
             ((This*)expr)->accept(this); break;
+        case AST_NODE_TYPES::EXPR_SUPER:
+            ((Super*)expr)->accept(this); break;
     }
 }
 
@@ -194,6 +196,17 @@ MyLang_Object *Resolver::visit(This *keyword)
     resolveLocal(keyword, keyword->keyword);
     return nullptr;
 }
+MyLang_Object *Resolver::visit(Super *superkey)
+{
+    if(this->currentClassType == CLASS_TYPE::C_NONE){
+        myLang::communicateError(superkey->keyword, "Can't use 'super' outside of a class.");
+    }
+    else if(this->currentClassType == CLASS_TYPE::BASE_CLASS){
+        myLang::communicateError(superkey->keyword, "Can't use 'super' in a base class.");
+    }
+    resolveLocal(superkey, superkey->keyword);
+    return nullptr;
+}
 void Resolver::visit(Print *printStmt)
 {
     resolve(printStmt->expression);
@@ -240,8 +253,10 @@ void Resolver::visit(Class *classDecl)
                 "A class cannot inherit from itself.");
     }
 
-    if(classDecl->superclass)
+    if(classDecl->superclass){
+        this->currentClassType = CLASS_TYPE::SUB_CLASS;
         resolve(classDecl->superclass);
+    }
     if(classDecl->superclass){
         beginScope();
         (*(scopes->back()))["super"] = true;

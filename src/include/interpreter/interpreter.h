@@ -28,6 +28,7 @@ public:
     virtual MyLang_Object* visit(Get* instGet);
     virtual MyLang_Object* visit(Set* instSet);
     virtual MyLang_Object* visit(This* keyword);
+    virtual MyLang_Object* visit(Super* superkey);
     virtual void visit(Print* printStmt);
     virtual void visit(Expression* exprStmt);
     virtual void visit(Var* varStmt);
